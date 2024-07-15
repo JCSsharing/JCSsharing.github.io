@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Olympic Games Countdown</title>
+  <style>
+    @font-face {
+      font-family: 'ITCFranklinGothicLTBookCondensed';
+      src: url('https://cdn.jsdelivr.net/gh/JCSsharing/countdown@main/ITCFranklinGothicLTBookCompressed_normal_condensed.woff') format('woff');
+    }
+
+    @font-face {
+      font-family: 'ITCFranklinGothicLTDemiCompressed';
+      src: url('https://cdn.jsdelivr.net/gh/JCSsharing/countdown@main/ITCFranklinGothicLTDemiCompressed_normal_condensed.woff') format('woff');
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'ITCFranklinGothicLTDemiCompressed', Arial, sans-serif;
+      text-transform: uppercase;
+      background: url('https://raw.githubusercontent.com/JCSsharing/countdown/2bf494ecca4b7d2824d5de13f8453804d6d3969a/olympics.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3); /* Opacity adjustable */
+      z-index: 1; /* Ensures overlay is above the image but below the content */
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 20px;
+      margin-top: 100px; /* Adjust this value to move all content down */
+    }
+
+    .title {
+      font-size: 190px;
+      font-weight: bold;
+      letter-spacing: 12px;
+    }
+
+    .countdown-container {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 150px));
+      grid-template-rows: 40px 22px;
+      grid-gap: 80px;
+      justify-content: center;
+      align-items: start;
+      text-align: center;
+      margin-top: 300px; /* Adjust this value to move the countdown down */
+    }
+
+    .countdown-label {
+      font-family: 'ITCFranklinGothicLTBookCondensed', Arial, sans-serif;
+      font-size: 40px;
+      letter-spacing: 6px;
+      grid-row: 2;
+    }
+
+    .countdown-item {
+      font-weight: bold;
+      font-size: 120px;
+      letter-spacing: 6px;
+      grid-row: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="content">
+    <div class="title">OLYMPIC GAMES</div>
+    <div class="countdown-container">
+      <div class="countdown-item" id="olympics-days-bold">00</div>
+      <div class="countdown-item" id="olympics-hours">00</div>
+      <div class="countdown-item" id="olympics-minutes">00</div>
+      <div class="countdown-item" id="olympics-seconds">00</div>
+      <div class="countdown-label">DAYS</div>
+      <div class="countdown-label">HOURS</div>
+      <div class="countdown-label">MINUTES</div>
+      <div class="countdown-label">SECONDS</div>
+    </div>
+  </div>
+
+  <script>
+    const olympicsEndDate = new Date("2024-07-26T19:30:00+02:00").getTime(); // Paris 2024 Olympics (CET)
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = olympicsEndDate - now;
+
+      if (distance <= 0) {
+        document.getElementById("olympics-days-bold").textContent = "00";
+        document.getElementById("olympics-hours").textContent = "00";
+        document.getElementById("olympics-minutes").textContent = "00";
+        document.getElementById("olympics-seconds").textContent = "00";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("olympics-days-bold").textContent = days < 10 ? `0${days}` : days;
+      document.getElementById("olympics-hours").textContent = hours < 10 ? `0${hours}` : hours;
+      document.getElementById("olympics-minutes").textContent = minutes < 10 ? `0${minutes}` : minutes;
+      document.getElementById("olympics-seconds").textContent = seconds < 10 ? `0${seconds}` : seconds;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>
