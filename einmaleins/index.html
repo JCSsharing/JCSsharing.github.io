@@ -4,6 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Einmaleins-Metronom</title>
+<meta name="description" content="Die Familien-Challenge fürs Einmaleins: im Takt des Metronoms rechnen, Rekorde jagen, Medaillen und Urkunden sammeln.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Einmaleins-Metronom">
+<meta property="og:title" content="Einmaleins im Takt">
+<meta property="og:description" content="Die Familien-Challenge mit Metronom, Medaillen und Urkunden.">
+<meta property="og:url" content="https://jcssharing.github.io/einmaleins/">
+<meta property="og:image" content="https://jcssharing.github.io/einmaleins/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jcssharing.github.io/einmaleins/og.png">
+<meta name="theme-color" content="#101119">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-title" content="1×1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -216,6 +232,23 @@ tr:last-child td{padding-bottom:12px}
 .certov a.btn-main{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:99px;height:56px;flex:1;font-weight:700}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
 @media (prefers-reduced-motion: reduce){.nb,.certov img{animation:none}}
+.gate{position:fixed;inset:0;z-index:60;background:radial-gradient(120% 60% at 50% 0%,#1d2140,var(--bg) 70%);display:flex;align-items:center;justify-content:center;padding:20px}
+.gate[hidden]{display:none}
+.gate-card{width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.gate-card.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.gate-logo{display:flex;gap:8px}
+.gate-logo i{width:14px;height:14px;border-radius:50%}
+.gate h1{font-size:26px;font-weight:800}
+.gate p{margin:0;color:var(--muted);font-size:15px;min-height:1.4em}
+.gate p.err{color:var(--stop)}
+.gate-dots{display:flex;gap:16px;margin:6px 0 10px}
+.gate-dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--faint)}
+.gate-dots i.on{background:var(--ink);border-color:var(--ink)}
+.gate-pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px}
+.gate-pad button{height:76px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-family:var(--display);font-size:30px;font-weight:700}
+.gate-pad button:active{background:var(--surface-2)}
+@media (prefers-reduced-motion: reduce){.gate-card.shake{animation:none}}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14.5px;font-weight:700;z-index:40;max-width:90vw;text-align:center}
 .toast[hidden]{display:none}
 </style>
@@ -358,6 +391,20 @@ tr:last-child td{padding-bottom:12px}
   </div>
 </div>
 <canvas id="confetti" aria-hidden="true"></canvas>
+<div class="gate" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="gate-card" id="gateCard">
+    <div class="gate-logo"><i style="background:var(--p-jens)"></i><i style="background:var(--p-heloisa)"></i><i style="background:var(--p-amelie)"></i><i style="background:var(--p-nala)"></i></div>
+    <h1 id="gateTitle">Einmaleins-Metronom</h1>
+    <p id="gateMsg">Bitte den Familien-Code eingeben.</p>
+    <div class="gate-dots" id="gateDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="gate-pad" id="gatePad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <span></span><button data-k="0">0</button><button data-k="del" aria-label="Löschen">⌫</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -763,8 +810,8 @@ function sheetEnqueue(op){
   sheetQueue.push(op);sheetSave();sheetApply();render();sheetStatus();sheetFlush();
 }
 async function sheetPost(op){
-  const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(op)});
-  const j=await r.json();if(!j.ok)throw new Error(j.error||"Fehler");
+  const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...op,pin:getPin()})});
+  const j=await r.json();if(!j.ok){if(j.error==="pin")lockOut();throw new Error(j.error||"Fehler");}
 }
 async function sheetFlush(){
   if(flushing||!sheetQueue.length)return;flushing=true;
@@ -779,14 +826,50 @@ async function sheetFlush(){
 }
 async function sheetPull(){
   try{
-    const r=await fetch(SHEET_URL,{cache:"no-store"});const j=await r.json();if(!j.ok)throw new Error();
+    const r=await fetch(SHEET_URL+"?pin="+encodeURIComponent(getPin()),{cache:"no-store"});const j=await r.json();
+    if(!j.ok){if(j.error==="pin")lockOut();throw new Error();}
     sheetServer=(j.attempts||[]).map(a=>norm(a.id,a)).filter(Boolean);
     if(j.config&&(j.config.goal==="x10"||j.config.goal==="100")&&!sheetQueue.some(q=>q.action==="config"))config.goal=j.config.goal;
     lastSync=Date.now();sheetSave();sheetApply();renderLog.loading=null;render();
   }catch(e){}
   sheetStatus();
 }
-async function sheetSync(){await sheetFlush();await sheetPull();}
+async function sheetSync(){if(!getPin())return;await sheetFlush();await sheetPull();}
+let sheetStarted=false;
+function startSheet(){
+  sheetLoadCache();sheetApply();
+  renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden aus der Google-Tabelle geladen …";
+  render();sheetStatus();sheetSync();
+  if(sheetStarted)return;sheetStarted=true;
+  setInterval(()=>{if(document.visibilityState==="visible")sheetSync()},30000);
+  window.addEventListener("online",sheetSync);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sheetSync()});
+}
+
+/* Family code: checked by the Google script, never stored in this page's source */
+const LS_PIN="einmaleins-pin-v1";
+function getPin(){try{return localStorage.getItem(LS_PIN)||""}catch(e){return ""}}
+function setPin(p){try{p?localStorage.setItem(LS_PIN,p):localStorage.removeItem(LS_PIN)}catch(e){}}
+let gateCode="",gateBusy=false;
+function showGate(msg){gateCode="";$("gate").hidden=false;$("gateMsg").textContent=msg||"Bitte den Familien-Code eingeben.";$("gateMsg").classList.toggle("err",!!msg);gateDots();}
+function lockOut(){setPin("");showGate("Der Code ist nicht mehr gültig. Bitte neu eingeben.");}
+function gateDots(){[...$("gateDots").children].forEach((d,i)=>d.classList.toggle("on",i<gateCode.length))}
+async function gateCheck(){
+  gateBusy=true;$("gateMsg").textContent="Prüfe …";$("gateMsg").classList.remove("err");
+  try{
+    const r=await fetch(SHEET_URL+"?pin="+encodeURIComponent(gateCode),{cache:"no-store"});const j=await r.json();
+    if(j.ok){setPin(gateCode);$("gate").hidden=true;startSheet();}
+    else{const c=$("gateCard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");gateCode="";gateDots();$("gateMsg").textContent="Falscher Code. Nochmal versuchen.";$("gateMsg").classList.add("err");}
+  }catch(e){gateCode="";gateDots();$("gateMsg").textContent="Keine Verbindung. Bitte mit Internet nochmal versuchen.";$("gateMsg").classList.add("err");}
+  gateBusy=false;
+}
+function gateKey(k){
+  if(gateBusy||$("gate").hidden)return;
+  if(k==="del")gateCode=gateCode.slice(0,-1);else if(/^\d$/.test(k)&&gateCode.length<4)gateCode+=k;
+  gateDots();if(gateCode.length===4)gateCheck();
+}
+$("gatePad").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b)gateKey(b.dataset.k)});
+document.addEventListener("keydown",e=>{if($("gate").hidden)return;if(/^\d$/.test(e.key))gateKey(e.key);else if(e.key==="Backspace")gateKey("del");});
 
 const store={
   async put(a){
@@ -816,12 +899,7 @@ const store={
 async function init(){
   route();render();
   if(USE_SHEET){
-    sheetLoadCache();sheetApply();
-    renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden aus der Google-Tabelle geladen …";
-    render();sheetStatus();sheetSync();
-    setInterval(()=>{if(document.visibilityState==="visible")sheetSync()},30000);
-    window.addEventListener("online",sheetSync);
-    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sheetSync()});
+    if(getPin())startSheet();else showGate();
     return;
   }
   renderLog.loading="Ergebnisse werden geladen …";renderLog();
