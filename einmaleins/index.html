@@ -300,15 +300,15 @@ tr:last-child td{padding-bottom:12px}
       <div class="box rules">
         <ol>
           <li>Jede Reihe startet bei <b>60 BPM</b>. Nach 4 Vorzähl-Ticks kommt auf jeden Schlag die nächste Zahl.</li>
-          <li>Wer die Reihe <b id="ruleGoal">bis 100</b> ohne Fehler schafft, schaltet das nächste Level frei: <b>10 BPM schneller</b>.</li>
+          <li>Wer die Reihe <b id="ruleGoal">bis ×10</b> ohne Fehler schafft, schaltet das nächste Level frei: <b>10 BPM schneller</b>.</li>
           <li>Beim ersten Fehler drückt der Spielleiter <b>Stopp</b>. Gespeichert wird die letzte richtige Zahl.</li>
           <li><b>Tagesziel:</b> mindestens eine Zahl weiter als der eigene Rekord auf dem aktuellen Level.</li>
           <li>Drei Versuche ohne neuen Rekord? Dann schlägt die App eine Zwischenstufe 5 BPM langsamer vor.</li>
         </ol>
       </div>
       <div class="seg" role="group" aria-label="Wie weit geht eine Reihe?">
-        <button id="goal100" aria-pressed="true">Reihe bis 100</button>
-        <button id="goal10" aria-pressed="false">Reihe bis ×10</button>
+        <button id="goal10" aria-pressed="true">Reihe bis ×10 (Standard)</button>
+        <button id="goal100" aria-pressed="false">Reihe bis 100</button>
       </div>
     </section>
   </div>
@@ -372,7 +372,7 @@ const ROWS=[1,2,3,4,5,6,7,8,9,10];
 const START_BPM=60, STEP_BPM=10, MIN_BPM=30, MAX_BPM=240;
 const LS_KEY="einmaleins-metronom-v1";
 
-let attempts=[], config={goal:"100"}, db=null, readOnly=false;
+let attempts=[], config={goal:"x10"}, db=null, readOnly=false;
 let sel={player:null,row:null,bpm:START_BPM};
 const $=id=>document.getElementById(id);
 
