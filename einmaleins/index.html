@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Einmaleins-Metronom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* One dark world (made for the car in the morning). Layout: top segmented switch, page "Spielen" = 3 steps + start, page "Statistik" = cards, board, log. */
+  --bg:#101119; --surface:#191b26; --surface-2:#222533; --line:#2c3042;
+  --ink:#f4f2ec; --muted:#9496a8; --faint:#5d6074;
+  --p-jens:#7b93ff; --p-heloisa:#ff7eb3; --p-amelie:#48dcc2; --p-nala:#ffb84d;
+  --stop:#ff5b5f; --accent:var(--ink);
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+  --r:18px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body{padding:0 16px 40px;background:radial-gradient(120% 60% at 50% -10%, color-mix(in srgb,var(--pc,#7b93ff) 16%, transparent), transparent 70%) var(--bg);background-attachment:fixed;transition:background .4s}
+main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+header{padding-top:18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--pc,var(--ink));box-shadow:0 0 14px var(--pc,transparent);transition:background .3s}
+.tabs{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px}
+.tabs a{color:var(--muted);text-decoration:none;font-size:14.5px;font-weight:700;padding:7px 14px;border-radius:99px}
+.tabs a[aria-current="page"]{background:var(--surface-2);color:var(--ink)}
+.tabs a:focus-visible{outline:2px solid var(--ink)}
+.banner{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14.5px;color:var(--muted)}
+.banner[hidden],.view[hidden]{display:none}
+.view{display:flex;flex-direction:column;gap:26px}
+
+.label{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.label b{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;background:var(--surface-2);color:var(--muted);font-size:11.5px;letter-spacing:0}
+
+/* Step 1: players */
+.players{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.player{--c:var(--muted);background:none;border:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.avatar{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:24px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--surface));border:2px solid color-mix(in srgb,var(--c) 30%,transparent);transition:transform .15s,background .2s}
+.player .nm{font-size:14.5px;color:var(--muted);font-weight:700}
+.player[aria-pressed="true"] .avatar{background:var(--c);color:var(--bg);border-color:var(--c);box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 22%,transparent);transform:scale(1.04)}
+.player[aria-pressed="true"] .nm{color:var(--ink)}
+
+/* Step 2: rows */
+.rows{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:14px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}
+.row .n{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1}
+.row .b{min-height:1.2em;font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.row.done .b{color:color-mix(in srgb,var(--pc) 80%,var(--ink))}
+.row[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.row[aria-pressed="true"] .b{color:var(--bg);opacity:.7}
+
+/* Step 3: tempo */
+.tempo{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tempo .step{width:56px;height:56px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:26px;line-height:1;color:var(--ink)}
+.tempo .val{text-align:center;flex:1}
+.tempo .val strong{font-family:var(--display);font-weight:800;font-size:64px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.tempo .val span{display:block;font-size:13px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.goal{border-radius:var(--r);padding:14px 16px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:3px;font-size:15px;color:var(--muted)}
+.goal strong{color:var(--ink);font-family:var(--display);font-weight:700;font-size:18px}
+.goal .hint{color:var(--p-nala)}
+.lvl{border:none;background:none;color:var(--ink);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:0;font-size:15px}
+
+.start{height:70px;border:none;border-radius:99px;background:var(--pc,var(--surface-2));color:var(--bg);font-family:var(--display);font-weight:800;font-size:24px;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px -10px var(--pc,transparent);transition:background .3s}
+.start svg{width:22px;height:22px}
+.start:disabled{background:var(--surface-2);color:var(--faint);box-shadow:none;cursor:not-allowed}
+.startsub{text-align:center;color:var(--faint);font-size:14px;margin-top:-14px}
+
+/* Stats */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pcard{--c:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.pcard::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--c)}
+.pcard h3{font-size:18px;font-weight:700;color:var(--c)}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kv div{display:flex;flex-direction:column}
+.kv strong{font-family:var(--display);font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kv span{font-size:11.5px;line-height:1.25;color:var(--faint)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.board-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:13.5px}
+th,td{padding:6px 3px;text-align:center}
+th{font-weight:700;color:var(--faint);font-size:12px;padding-top:12px}
+td.who{padding-left:10px;width:34px}
+td.who span{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-family:var(--display);font-weight:800;font-size:13px;color:var(--bg);background:var(--c)}
+td.cell button{border:none;width:100%;min-width:28px;height:32px;border-radius:9px;font-weight:700;font-size:13px;color:var(--ink);background:color-mix(in srgb,var(--c) calc(var(--lv) * 1%),var(--surface-2))}
+td.cell button.none{color:var(--faint);font-weight:400;background:var(--surface-2);opacity:.55}
+tr:last-child td{padding-bottom:12px}
+.legend{font-size:13px;color:var(--faint);margin-top:8px}
+.log{display:flex;flex-direction:column;gap:18px}
+.day h3{font-family:var(--body);font-size:13px;color:var(--faint);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.entries{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.entry{display:flex;align-items:center;gap:12px;padding:11px 12px;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:none}
+.entry .av{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:14px;color:var(--bg);background:var(--c)}
+.entry .txt{flex:1;min-width:0;font-size:15px}
+.entry .sub{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums}
+.entry .res{font-family:var(--display);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums;text-align:right;line-height:1.1}
+.entry .res small{display:block;font-family:var(--body);font-weight:700;font-size:11px;color:var(--c, var(--muted));letter-spacing:.04em;text-transform:uppercase}
+.del{border:none;background:none;color:var(--faint);font-size:20px;width:34px;height:34px;border-radius:50%}
+.del.confirm{background:var(--stop);color:var(--bg);font-size:12px;font-weight:700;width:auto;padding:0 10px;border-radius:99px}
+.empty{color:var(--muted);font-size:15px;border:1px dashed var(--line);border-radius:var(--r);padding:16px}
+.rules ol{margin:0;padding:14px 16px 14px 34px;display:flex;flex-direction:column;gap:8px;font-size:15px;color:var(--muted)}
+.rules b{color:var(--ink)}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px;margin-top:10px}
+.seg button{flex:1;height:42px;border:none;background:none;border-radius:99px;font-size:14.5px;color:var(--muted);font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink)}
+
+/* Run stage */
+.stage{position:fixed;inset:0;z-index:20;background:#0b0c12;display:flex;flex-direction:column;padding:16px 16px 20px;gap:14px}
+.stage[hidden]{display:none}
+.stage .top{display:flex;justify-content:space-between;align-items:center}
+.stage .who{font-family:var(--display);font-weight:800;font-size:22px;color:var(--pc)}
+.stage .who span{display:block;font-family:var(--body);font-weight:400;font-size:14.5px;color:var(--muted)}
+.stage .cancel{background:var(--surface);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 14px;font-size:14px}
+.bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar div{height:100%;background:var(--pc);width:0;transition:width .15s;border-radius:99px}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:0}
+.bignum{font-family:var(--display);font-weight:800;font-size:clamp(120px,44vw,300px);line-height:.9;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--ink);transition:transform .08s ease-out}
+.bignum.count{color:var(--faint)}
+.bignum.pulse{transform:scale(1.05)}
+.eq{font-size:20px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:1.4em}
+.beatdots{display:flex;gap:12px;margin-top:10px}
+.beatdots i{width:14px;height:14px;border-radius:50%;background:var(--surface-2)}
+.beatdots i.on{background:var(--pc);box-shadow:0 0 12px var(--pc)}
+.stop{min-height:26vh;border:none;border-radius:28px;background:var(--stop);color:#fff;font-family:var(--display);font-weight:800;font-size:42px;letter-spacing:.02em;line-height:1.1;box-shadow:0 14px 40px -12px var(--stop)}
+.stop small{display:block;font-family:var(--body);font-weight:400;font-size:16px;letter-spacing:0;opacity:.9}
+@media (prefers-reduced-motion: reduce){.bignum,.avatar{transition:none}.bignum.pulse{transform:none}}
+
+/* Result sheet */
+.result{position:fixed;inset:0;z-index:30;background:rgba(5,6,10,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.result[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:22px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:16px}
+.card h2{font-size:28px;font-weight:800;letter-spacing:-.01em}
+.card.win h2{color:var(--pc)}
+.card .msg{font-size:16px;color:var(--muted)}
+.card .msg b{color:var(--ink)}
+.adjust{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:20px;padding:10px}
+.adjust .step{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:24px}
+.adjust .val{flex:1;text-align:center}
+.adjust .val strong{font-family:var(--display);font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.adjust .val span{display:block;font-size:12.5px;color:var(--faint)}
+.actions{display:flex;gap:10px}
+.actions button{flex:1;height:56px;border-radius:99px;font-size:17px;font-weight:700}
+.btn-main{background:var(--pc,var(--ink));color:var(--bg);border:none}
+.btn-ghost{background:none;border:1px solid var(--line);color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14.5px;font-weight:700;z-index:40;max-width:90vw;text-align:center}
+.toast[hidden]{display:none}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand"><i></i>Einmaleins</div>
+    <nav class="tabs" aria-label="Seiten">
+      <a href="#spielen" id="tabPlay">Spielen</a>
+      <a href="#statistik" id="tabStats">Statistik</a>
+    </nav>
+  </header>
+  <div class="banner" id="banner" hidden></div>
+
+  <!-- PAGE 1: Spielen -->
+  <div class="view" id="viewPlay">
+    <section>
+      <div class="label"><b>1</b>Wer ist dran?</div>
+      <div class="players" id="players"></div>
+    </section>
+    <section>
+      <div class="label"><b>2</b>Welche Reihe?</div>
+      <div class="rows" id="rows"></div>
+    </section>
+    <section>
+      <div class="label"><b>3</b>Tempo</div>
+      <div class="tempo">
+        <button class="step" id="bpmDown" aria-label="5 BPM langsamer">−</button>
+        <div class="val"><strong id="bpmVal">60</strong><span>BPM</span></div>
+        <button class="step" id="bpmUp" aria-label="5 BPM schneller">+</button>
+      </div>
+    </section>
+    <div class="goal" id="goal"></div>
+    <button class="start" id="startBtn" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>Start</button>
+    <div class="startsub" id="startSub">Erst Spieler und Reihe wählen</div>
+  </div>
+
+  <!-- PAGE 2: Statistik -->
+  <div class="view" id="viewStats" hidden>
+    <section>
+      <div class="label">Überblick</div>
+      <div class="cards" id="cards"></div>
+    </section>
+    <section>
+      <div class="label">Level pro Reihe (BPM)</div>
+      <div class="box board-wrap"><table id="board"></table></div>
+      <div class="legend">Zahl = aktuelles Level in BPM. Je kräftiger die Farbe, desto schneller. Feld antippen, um genau das zu spielen.</div>
+    </section>
+    <section>
+      <div class="label">Verlauf</div>
+      <div class="log" id="log"><div class="empty">Ergebnisse werden geladen …</div></div>
+    </section>
+    <section>
+      <div class="label">Spielregeln</div>
+      <div class="box rules">
+        <ol>
+          <li>Jede Reihe startet bei <b>60 BPM</b>. Nach 4 Vorzähl-Ticks kommt auf jeden Schlag die nächste Zahl.</li>
+          <li>Wer die Reihe <b id="ruleGoal">bis 100</b> ohne Fehler schafft, schaltet das nächste Level frei: <b>10 BPM schneller</b>.</li>
+          <li>Beim ersten Fehler drückt der Spielleiter <b>Stopp</b>. Gespeichert wird die letzte richtige Zahl.</li>
+          <li><b>Tagesziel:</b> mindestens eine Zahl weiter als der eigene Rekord auf dem aktuellen Level.</li>
+          <li>Drei Versuche ohne neuen Rekord? Dann schlägt die App eine Zwischenstufe 5 BPM langsamer vor.</li>
+        </ol>
+      </div>
+      <div class="seg" role="group" aria-label="Wie weit geht eine Reihe?">
+        <button id="goal100" aria-pressed="true">Reihe bis 100</button>
+        <button id="goal10" aria-pressed="false">Reihe bis ×10</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="stage" id="stage" hidden>
+  <div class="top">
+    <div class="who" id="stWho">–</div>
+    <button class="cancel" id="stCancel">Abbrechen</button>
+  </div>
+  <div class="bar"><div id="stBar"></div></div>
+  <div class="center">
+    <div class="bignum count" id="stNum">4</div>
+    <div class="eq" id="stEq">Gleich geht's los</div>
+    <div class="beatdots" id="stDots"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <button class="stop" id="stStop">STOPP<small>beim ersten Fehler drücken</small></button>
+</div>
+
+<div class="result" id="result" hidden>
+  <div class="card" id="resCard" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+    <h2 id="resTitle">Gespeichert</h2>
+    <div class="msg" id="resMsg"></div>
+    <div class="adjust">
+      <button class="step" id="adjDown" aria-label="Eine Zahl weniger">−</button>
+      <div class="val"><strong id="adjVal">0</strong><span id="adjSub">letzte richtige Zahl</span></div>
+      <button class="step" id="adjUp" aria-label="Eine Zahl mehr">+</button>
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" id="resDiscard">Löschen</button>
+      <button class="btn-main" id="resDone">Fertig</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const PLAYERS=[
+  {id:"jens",name:"Jens",ini:"J",color:"--p-jens"},
+  {id:"heloisa",name:"Heloísa",ini:"H",color:"--p-heloisa"},
+  {id:"amelie",name:"Amelie",ini:"A",color:"--p-amelie"},
+  {id:"nala",name:"Nala Lina",ini:"N",color:"--p-nala"}
+];
+const PID=PLAYERS.map(p=>p.id);
+const ROWS=[1,2,3,4,5,6,7,8,9,10];
+const START_BPM=60, STEP_BPM=10, MIN_BPM=30, MAX_BPM=240;
+const LS_KEY="einmaleins-metronom-v1";
+
+let attempts=[], config={goal:"100"}, db=null, readOnly=false;
+let sel={player:null,row:null,bpm:START_BPM};
+const $=id=>document.getElementById(id);
+
+function pad(n){return String(n).padStart(2,"0")}
+function todayStr(d=new Date()){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function fmtDay(s){const d=new Date(s+"T12:00:00");const t=todayStr();const y=todayStr(new Date(Date.now()-864e5));
+  const base=d.toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"short"});
+  return s===t?"Heute · "+base:s===y?"Gestern · "+base:base;}
+function stepsFor(row,goal){return goal==="x10"?10:Math.floor(100/row)}
+function player(id){return PLAYERS.find(p=>p.id===id)}
+function pcol(id){const p=player(id);return p?`var(${p.color})`:"var(--ink)"}
+function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,3200)}
+function setPlayerColor(){
+  if(sel.player)document.documentElement.style.setProperty("--pc",pcol(sel.player));
+  else document.documentElement.style.removeProperty("--pc");
+}
+
+function norm(id,o){
+  if(!o||!PID.includes(o.player))return null;
+  const row=Number(o.row),bpm=Number(o.bpm),steps=Number(o.steps),maxSteps=Number(o.maxSteps),ts=Number(o.ts);
+  if(!ROWS.includes(row)||!Number.isFinite(bpm)||!Number.isFinite(steps)||!Number.isFinite(maxSteps))return null;
+  const date=typeof o.date==="string"&&/^\d{4}-\d\d-\d\d$/.test(o.date)?o.date:todayStr(new Date(ts||Date.now()));
+  return {id,player:o.player,row,bpm,steps,maxSteps,reached:steps*row,complete:steps>=maxSteps,date,ts:Number.isFinite(ts)?ts:0};
+}
+
+/* ---------- Logic ---------- */
+function statsFor(pid,row,bpm){
+  const list=attempts.filter(a=>a.player===pid&&a.row===row).sort((a,b)=>b.ts-a.ts);
+  const comp=list.filter(a=>a.complete);
+  const unlocked=comp.length?Math.max(...comp.map(a=>a.bpm)):null;
+  const level=unlocked!=null?unlocked+STEP_BPM:(list[0]?list[0].bpm:START_BPM);
+  const b=bpm??level;
+  const at=list.filter(a=>a.bpm===b);
+  const record=at.length?Math.max(...at.map(a=>a.steps)):null;
+  let best=-1,since=0;
+  [...at].reverse().forEach(a=>{if(a.steps>best){best=a.steps;since=0}else since++});
+  return {list,unlocked,level,bpm:b,at,record,since,last:at[0]||null};
+}
+function streak(pid){
+  const days=new Set(attempts.filter(a=>a.player===pid).map(a=>a.date));
+  let d=new Date();if(!days.has(todayStr(d)))d=new Date(Date.now()-864e5);
+  let n=0;while(days.has(todayStr(d))){n++;d=new Date(d.getTime()-864e5)}
+  return n;
+}
+
+/* ---------- Routing ---------- */
+function route(){
+  const stats=location.hash==="#statistik";
+  $("viewPlay").hidden=stats;$("viewStats").hidden=!stats;
+  $("tabPlay").setAttribute("aria-current",stats?"false":"page");
+  $("tabStats").setAttribute("aria-current",stats?"page":"false");
+}
+window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
+
+/* ---------- Render ---------- */
+function render(){
+  setPlayerColor();
+  renderPlayers();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();
+}
+function renderPlayers(){
+  $("players").innerHTML=PLAYERS.map(p=>`<button class="player" style="--c:${pcol(p.id)}" data-p="${p.id}" aria-pressed="${sel.player===p.id}"><span class="avatar">${p.ini}</span><span class="nm">${p.name}</span></button>`).join("");
+}
+function renderRows(){
+  $("rows").innerHTML=ROWS.map(r=>{
+    let b="",done=false;
+    if(sel.player){const s=statsFor(sel.player,r);if(s.list.length)b=s.level;done=s.unlocked!=null;}
+    return `<button class="row${done?" done":""}" data-r="${r}" aria-pressed="${sel.row===r}"><span class="n">${r}er</span><span class="b">${b}</span></button>`;
+  }).join("");
+}
+function renderTempo(){
+  $("bpmVal").textContent=sel.bpm;
+  const g=$("goal"),sb=$("startBtn");
+  if(!sel.player||!sel.row){g.hidden=true;sb.disabled=true;$("startSub").textContent="Erst Spieler und Reihe wählen";return;}
+  g.hidden=false;
+  const p=player(sel.player),r=sel.row,max=stepsFor(r,config.goal),last=max*r;
+  const s=statsFor(sel.player,r,sel.bpm);
+  let html;
+  if(s.unlocked!=null&&sel.bpm<=s.unlocked){
+    html=`<strong>Aufwärmrunde</strong><span>${sel.bpm} BPM ist schon freigeschaltet.</span>`;
+  }else if(s.record==null){
+    html=`<strong>Ziel: so weit wie möglich</strong><span>Erster Versuch bei ${sel.bpm} BPM · Reihe bis ${last}</span>`;
+  }else{
+    const nextNum=Math.min(s.record+1,max)*r;
+    html=`<strong>Ziel: bis ${nextNum}</strong><span>Rekord bis ${s.record*r} · noch ${max-s.record} Zahlen bis zum nächsten Level</span>`;
+    if(s.since>=3&&sel.bpm-5>=MIN_BPM)html+=`<span class="hint">${s.since} Versuche ohne Rekord. Tipp: Zwischenstufe mit ${sel.bpm-5} BPM.</span>`;
+  }
+  if(sel.bpm!==s.level)html+=`<span>Aktuelles Level: ${s.level} BPM · <button class="lvl" id="toLevel">zurücksetzen</button></span>`;
+  g.innerHTML=html;
+  const tl=$("toLevel");if(tl)tl.onclick=()=>{sel.bpm=s.level;renderTempo();};
+  sb.disabled=false;$("startSub").textContent=`${p.name} · ${r}er-Reihe · ${sel.bpm} BPM`;
+}
+function renderCards(){
+  const t=todayStr();
+  $("cards").innerHTML=PLAYERS.map(p=>{
+    const mine=attempts.filter(a=>a.player===p.id);
+    const today=mine.filter(a=>a.date===t).length;
+    let levels=0,top=null;
+    ROWS.forEach(r=>{const s=statsFor(p.id,r);if(s.unlocked!=null){levels+=Math.max(1,(s.unlocked-START_BPM)/STEP_BPM+1);top=Math.max(top??0,s.unlocked);}});
+    return `<div class="pcard" style="--c:${pcol(p.id)}"><h3>${p.name}</h3><div class="kv">
+      <div><strong>${streak(p.id)}</strong><span>Tage in Folge</span></div>
+      <div><strong>${today}</strong><span>Versuche heute</span></div>
+      <div><strong>${levels}</strong><span>Level geschafft</span></div>
+      <div><strong>${top??"–"}</strong><span>schnellstes BPM</span></div></div></div>`;
+  }).join("");
+}
+function renderBoard(){
+  let h=`<tr><th></th>${ROWS.map(r=>`<th>${r}</th>`).join("")}</tr>`;
+  h+=PLAYERS.map(p=>`<tr><td class="who" style="--c:${pcol(p.id)}"><span title="${p.name}">${p.ini}</span></td>${ROWS.map(r=>{
+    const s=statsFor(p.id,r);const any=s.list.length>0;
+    const lv=Math.max(0,Math.min(90,22+(s.level-START_BPM)/STEP_BPM*16));
+    return `<td class="cell"><button style="--c:${pcol(p.id)};--lv:${any?lv:0}" class="${any?"":"none"}" data-p="${p.id}" data-r="${r}" aria-label="${p.name}, ${r}er-Reihe, ${s.level} BPM">${any?s.level:""}</button></td>`;
+  }).join("")}</tr>`).join("");
+  $("board").innerHTML=h;
+}
+let pendingDel=null;
+function renderLog(){
+  const el=$("log");
+  if(renderLog.loading){el.innerHTML=`<div class="empty">${renderLog.loading}</div>`;return;}
+  if(!attempts.length){el.innerHTML=`<div class="empty">Noch keine Versuche. Die erste Runde im Auto landet hier.</div>`;return;}
+  const sorted=[...attempts].sort((a,b)=>b.ts-a.ts).slice(0,80);
+  const byDay=new Map();sorted.forEach(a=>{if(!byDay.has(a.date))byDay.set(a.date,[]);byDay.get(a.date).push(a)});
+  el.innerHTML=[...byDay.entries()].sort((a,b)=>a[0]<b[0]?1:-1).map(([d,list])=>`<div class="day"><h3>${fmtDay(d)}</h3><div class="entries">${list.map(a=>{
+    const p=player(a.player);
+    return `<div class="entry" style="--c:${pcol(a.player)}"><span class="av">${p.ini}</span><div class="txt">${p.name}<div class="sub">${a.row}er · ${a.bpm} BPM · ${a.steps}/${a.maxSteps}</div></div><div class="res">${a.reached}${a.complete?"<small>geschafft</small>":""}</div>${readOnly?"":`<button class="del${pendingDel===a.id?" confirm":""}" data-del="${a.id}" aria-label="Versuch löschen">${pendingDel===a.id?"Löschen?":"×"}</button>`}</div>`;
+  }).join("")}</div></div>`).join("");
+}
+function renderSettings(){
+  $("goal100").setAttribute("aria-pressed",config.goal!=="x10");
+  $("goal10").setAttribute("aria-pressed",config.goal==="x10");
+  $("ruleGoal").textContent=config.goal==="x10"?"bis ×10":"bis 100";
+}
+
+/* ---------- Events ---------- */
+$("players").addEventListener("click",e=>{
+  const b=e.target.closest("[data-p]");if(!b)return;
+  sel.player=b.dataset.p;
+  const mine=attempts.filter(a=>a.player===sel.player).sort((a,b)=>b.ts-a.ts);
+  if(mine[0])sel.row=mine[0].row;
+  if(sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
+  render();
+});
+$("rows").addEventListener("click",e=>{
+  const b=e.target.closest("[data-r]");if(!b)return;
+  sel.row=Number(b.dataset.r);
+  sel.bpm=sel.player?statsFor(sel.player,sel.row).level:START_BPM;
+  render();
+});
+$("board").addEventListener("click",e=>{
+  const b=e.target.closest("[data-p]");if(!b)return;
+  sel.player=b.dataset.p;sel.row=Number(b.dataset.r);sel.bpm=statsFor(sel.player,sel.row).level;
+  render();location.hash="#spielen";
+});
+$("bpmDown").onclick=()=>{sel.bpm=Math.max(MIN_BPM,sel.bpm-5);renderTempo()};
+$("bpmUp").onclick=()=>{sel.bpm=Math.min(MAX_BPM,sel.bpm+5);renderTempo()};
+$("log").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-del]");if(!b)return;
+  const id=b.dataset.del;
+  if(pendingDel!==id){pendingDel=id;renderLog();setTimeout(()=>{if(pendingDel===id){pendingDel=null;renderLog()}},4000);return;}
+  pendingDel=null;await store.del(id);
+});
+$("goal100").onclick=()=>store.setGoal("100");
+$("goal10").onclick=()=>store.setGoal("x10");
+
+/* ---------- Storage ---------- */
+function lsRead(){try{return JSON.parse(localStorage.getItem(LS_KEY)||"{}")}catch(e){return {}}}
+function lsWrite(o){try{localStorage.setItem(LS_KEY,JSON.stringify(o))}catch(e){}}
+function writeErr(e){
+  if(e&&e.code==="invalid_argument"){readOnly=true;toast("Nur Ansicht: Speichern geht nur mit Bearbeitungsrecht.");render();}
+  else if(e&&e.code==="quota_exceeded")toast("Speicher voll. Bitte alte Versuche löschen.");
+  else toast("Speichern hat nicht geklappt. Bitte nochmal versuchen.");
+}
+/* Google-Tabelle als Speicher (für die Version auf GitHub Pages).
+   Alles landet sofort im Gerätespeicher und in einer Warteschlange; die Warteschlange wird
+   an die Tabelle geschickt, sobald Netz da ist. */
+const SHEET_URL="";
+const USE_SHEET=!!SHEET_URL&&!location.hostname.endsWith("claude.ai")&&!location.hostname.endsWith("claudeusercontent.com");
+const LS_SHEET="einmaleins-sheet-v1";
+let sheetServer=[],sheetQueue=[],flushing=false,lastSync=null;
+function sheetSave(){try{localStorage.setItem(LS_SHEET,JSON.stringify({server:sheetServer,queue:sheetQueue,goal:config.goal,lastSync}))}catch(e){}}
+function sheetLoadCache(){
+  try{const o=JSON.parse(localStorage.getItem(LS_SHEET)||"{}");
+    sheetServer=(o.server||[]).map(a=>norm(a.id,a)).filter(Boolean);sheetQueue=Array.isArray(o.queue)?o.queue:[];
+    if(o.goal==="x10"||o.goal==="100")config.goal=o.goal;lastSync=o.lastSync||null;}catch(e){}
+}
+function sheetApply(){
+  const m=new Map(sheetServer.map(a=>[a.id,a]));
+  sheetQueue.forEach(op=>{if(op.action==="put"){const n=norm(op.attempt.id,op.attempt);if(n)m.set(n.id,n)}else if(op.action==="del")m.delete(op.id)});
+  attempts=[...m.values()];
+}
+function sheetStatus(){
+  const bn=$("banner");
+  if(sheetQueue.length){bn.hidden=false;bn.textContent=`${sheetQueue.length} ${sheetQueue.length===1?"Ergebnis wartet":"Ergebnisse warten"} auf Verbindung und ${sheetQueue.length===1?"wird":"werden"} automatisch in die Google-Tabelle nachgetragen.`;}
+  else if(!lastSync){bn.hidden=false;bn.textContent="Verbinde mit der Google-Tabelle …";}
+  else bn.hidden=true;
+}
+function sheetEnqueue(op){
+  if(op.action==="put")sheetQueue=sheetQueue.filter(q=>!(q.action==="put"&&q.attempt.id===op.attempt.id));
+  if(op.action==="config")sheetQueue=sheetQueue.filter(q=>q.action!=="config");
+  sheetQueue.push(op);sheetSave();sheetApply();render();sheetStatus();sheetFlush();
+}
+async function sheetPost(op){
+  const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(op)});
+  const j=await r.json();if(!j.ok)throw new Error(j.error||"Fehler");
+}
+async function sheetFlush(){
+  if(flushing||!sheetQueue.length)return;flushing=true;
+  try{
+    while(sheetQueue.length){
+      const op=sheetQueue[0];await sheetPost(op);sheetQueue.shift();
+      if(op.action==="put"){const n=norm(op.attempt.id,op.attempt);sheetServer=sheetServer.filter(x=>x.id!==op.attempt.id);if(n)sheetServer.push(n);}
+      else if(op.action==="del")sheetServer=sheetServer.filter(x=>x.id!==op.id);
+      sheetSave();
+    }
+  }catch(e){}finally{flushing=false;sheetStatus();}
+}
+async function sheetPull(){
+  try{
+    const r=await fetch(SHEET_URL,{cache:"no-store"});const j=await r.json();if(!j.ok)throw new Error();
+    sheetServer=(j.attempts||[]).map(a=>norm(a.id,a)).filter(Boolean);
+    if(j.config&&(j.config.goal==="x10"||j.config.goal==="100")&&!sheetQueue.some(q=>q.action==="config"))config.goal=j.config.goal;
+    lastSync=Date.now();sheetSave();sheetApply();renderLog.loading=null;render();
+  }catch(e){}
+  sheetStatus();
+}
+async function sheetSync(){await sheetFlush();await sheetPull();}
+
+const store={
+  async put(a){
+    const body={player:a.player,row:a.row,bpm:a.bpm,steps:a.steps,maxSteps:a.maxSteps,reached:a.steps*a.row,complete:a.steps>=a.maxSteps,date:a.date,ts:a.ts};
+    if(USE_SHEET){sheetEnqueue({action:"put",attempt:{id:a.id,...body}});return true;}
+    if(db){
+      const ref=db.collection("attempts").doc(a.id);
+      try{await ref.set(body)}catch(e){if(e&&e.code==="unavailable"){await new Promise(r=>setTimeout(r,600+Math.random()*600));try{await ref.set(body)}catch(e2){writeErr(e2);return false}}else{writeErr(e);return false}}
+      return true;
+    }
+    const o=lsRead();o.attempts=o.attempts||{};o.attempts[a.id]=body;lsWrite(o);
+    attempts=attempts.filter(x=>x.id!==a.id);attempts.push(norm(a.id,body));render();return true;
+  },
+  async del(id){
+    if(USE_SHEET){sheetEnqueue({action:"del",id});return;}
+    if(db){try{await db.collection("attempts").doc(id).delete()}catch(e){writeErr(e)}return;}
+    const o=lsRead();if(o.attempts)delete o.attempts[id];lsWrite(o);attempts=attempts.filter(x=>x.id!==id);render();
+  },
+  async setGoal(g){
+    if(config.goal===g)return;config.goal=g;render();
+    if(USE_SHEET){sheetEnqueue({action:"config",goal:g});return;}
+    if(db){try{await db.doc("config/main").set({goal:g})}catch(e){writeErr(e)}}
+    else{const o=lsRead();o.config={goal:g};lsWrite(o);}
+  }
+};
+
+async function init(){
+  route();render();
+  if(USE_SHEET){
+    sheetLoadCache();sheetApply();
+    renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden aus der Google-Tabelle geladen …";
+    render();sheetStatus();sheetSync();
+    setInterval(()=>{if(document.visibilityState==="visible")sheetSync()},30000);
+    window.addEventListener("online",sheetSync);
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sheetSync()});
+    return;
+  }
+  renderLog.loading="Ergebnisse werden geladen …";renderLog();
+  let api=null;
+  for(let i=0;i<20&&!(window.claude&&window.claude.use);i++)await new Promise(r=>setTimeout(r,100));
+  try{if(window.claude&&window.claude.use)api=await window.claude.use("db")}catch(e){api=null}
+  if(!api){
+    const o=lsRead();
+    attempts=Object.entries(o.attempts||{}).map(([id,v])=>norm(id,v)).filter(Boolean);
+    if(o.config&&(o.config.goal==="x10"||o.config.goal==="100"))config.goal=o.config.goal;
+    const bn=$("banner");bn.hidden=false;bn.textContent=(window.claude&&window.claude.use)?"Gemeinsamer Speicher gerade nicht erreichbar. Ergebnisse werden vorerst nur auf diesem Gerät gesichert.":"Ergebnisse werden auf diesem Gerät gespeichert.";
+    renderLog.loading=null;render();return;
+  }
+  db=api;
+  let gotFirst=false;
+  const timer=setTimeout(()=>{if(!gotFirst){renderLog.loading="Die gespeicherten Ergebnisse sind gerade nicht erreichbar. Neue Versuche werden trotzdem gespeichert, sobald die Verbindung steht.";renderLog();}},10000);
+  db.collection("attempts").onSnapshot(snap=>{
+    attempts=snap.docs.filter(d=>d.exists).map(d=>norm(d.id,d.data())).filter(Boolean);
+    if(!snap.metadata.fromCache){gotFirst=true;clearTimeout(timer);}
+    if(gotFirst||attempts.length)renderLog.loading=null;
+    render();
+  },err=>{clearTimeout(timer);renderLog.loading=null;render();const bn=$("banner");bn.hidden=false;bn.textContent="Die Verbindung zum gemeinsamen Speicher ist abgebrochen. Bitte die Seite neu öffnen.";});
+  db.doc("config/main").onSnapshot(s=>{const d=s.exists?s.data():null;if(d&&(d.goal==="x10"||d.goal==="100")&&d.goal!==config.goal){config.goal=d.goal;render();}},()=>{});
+}
+
+/* ---------- Metronome run ---------- */
+let ctx=null,run=null,schedTimer=null,wakeLock=null;
+function click(time,kind){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type="square";o.frequency.value=kind==="count"?1760:1046;
+  const peak=kind==="count"?0.55:0.45;
+  g.gain.setValueAtTime(0.0001,time);
+  g.gain.exponentialRampToValueAtTime(peak,time+0.003);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.08);
+  o.connect(g);g.connect(ctx.destination);o.start(time);o.stop(time+0.1);
+  run.nodes.push({o,time});
+}
+function schedule(){
+  if(!run||run.done)return;
+  while(run.next<run.total&&run.start+run.next*run.iv<ctx.currentTime+0.15){
+    click(run.start+run.next*run.iv,run.next<4?"count":"beat");run.next++;
+  }
+}
+function latency(){return (ctx.outputLatency||0)+(ctx.baseLatency||0)}
+function frame(){
+  if(!run||run.done)return;
+  const t=ctx.currentTime-latency()-run.start;
+  const idx=Math.floor(t/run.iv);
+  if(idx>=0&&idx!==run.shown&&idx<run.total){run.shown=idx;showBeat(idx);}
+  if(t>=run.total*run.iv){finish(run.steps);return;}
+  requestAnimationFrame(frame);
+}
+function showBeat(idx){
+  const num=$("stNum"),eq=$("stEq");
+  if(idx<4){
+    num.textContent=4-idx;num.classList.add("count");eq.textContent="Vorzählen …";
+    [...$("stDots").children].forEach((d,i)=>d.classList.toggle("on",i<=idx));
+  }else{
+    const k=idx-3;
+    num.textContent=k*run.row;num.classList.remove("count");eq.textContent=`${k} × ${run.row}`;
+    $("stDots").style.visibility="hidden";
+    $("stBar").style.width=(k/run.steps*100)+"%";
+  }
+  num.classList.add("pulse");setTimeout(()=>num.classList.remove("pulse"),90);
+}
+$("startBtn").onclick=async()=>{
+  if(!sel.player||!sel.row)return;
+  if(readOnly){toast("Nur Ansicht: Speichern geht nur mit Bearbeitungsrecht.");return;}
+  try{
+    if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0);
+    await ctx.resume();
+  }catch(e){}
+  if(!ctx){toast("Ton konnte nicht gestartet werden. Lautstärke und Stummschalter prüfen.");return;}
+  const p=player(sel.player);
+  run={player:sel.player,row:sel.row,bpm:sel.bpm,steps:stepsFor(sel.row,config.goal),iv:60/sel.bpm,next:0,shown:-1,done:false,nodes:[]};
+  run.total=4+run.steps;
+  run.start=ctx.currentTime+0.25;
+  $("stWho").innerHTML=`${p.name}<span>${run.row}er-Reihe · ${run.bpm} BPM · bis ${run.steps*run.row}</span>`;
+  $("stNum").textContent="4";$("stNum").classList.add("count");$("stEq").textContent="Gleich geht's los";
+  $("stDots").style.visibility="visible";[...$("stDots").children].forEach(d=>d.classList.remove("on"));
+  $("stBar").style.width="0";
+  $("stage").hidden=false;
+  try{if(navigator.wakeLock)wakeLock=await navigator.wakeLock.request("screen")}catch(e){wakeLock=null}
+  schedule();schedTimer=setInterval(schedule,25);requestAnimationFrame(frame);
+};
+function silence(){
+  clearInterval(schedTimer);
+  const now=ctx?ctx.currentTime:0;
+  if(run)run.nodes.forEach(n=>{try{if(n.time>now)n.o.stop()}catch(e){}});
+  try{if(wakeLock){wakeLock.release();wakeLock=null}}catch(e){}
+}
+$("stStop").onclick=()=>{
+  if(!run||run.done)return;
+  if(run.shown<4){cancelRun();return;}
+  const k=run.shown-3;
+  finish(Math.max(0,k-1));
+};
+$("stCancel").onclick=cancelRun;
+function cancelRun(){if(!run)return;run.done=true;silence();$("stage").hidden=true;run=null;toast("Abgebrochen, nichts gespeichert.");}
+
+let res=null;
+async function finish(steps){
+  if(!run||run.done)return;
+  run.done=true;silence();
+  const r=run;run=null;
+  const before=statsFor(r.player,r.row,r.bpm);
+  res={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),player:r.player,row:r.row,bpm:r.bpm,steps,maxSteps:r.steps,date:todayStr(),ts:Date.now(),before,saved:steps};
+  $("stage").hidden=true;
+  showResult();
+  const ok=await store.put(res);
+  if(!ok&&res){res.failed=true;showResult();}
+}
+function showResult(){
+  const r=res,b=r.before,p=player(r.player),max=r.maxSteps,reached=r.steps*r.row;
+  let title,msg,win=false;
+  if(r.steps>=max){
+    win=true;title="Reihe geschafft!";
+    msg=(b.unlocked==null||r.bpm>b.unlocked)?`${p.name} hat die ${r.row}er-Reihe bei ${r.bpm} BPM ohne Fehler geschafft. Neues Level: <b>${r.bpm+STEP_BPM} BPM</b>.`:`${r.bpm} BPM war in der ${r.row}er-Reihe schon freigeschaltet. Gute Aufwärmrunde.`;
+  }else if(b.record==null){
+    title=`Bis ${reached}`;msg=`Erster Versuch bei ${r.bpm} BPM, das ist jetzt der Rekord. Nächstes Ziel: <b>${Math.min(r.steps+1,max)*r.row}</b>.`;
+  }else if(r.steps>b.record){
+    win=true;title="Neuer Rekord!";msg=`Bis <b>${reached}</b>, vorher war bei ${b.record*r.row} Schluss. Nächstes Ziel: <b>${Math.min(r.steps+1,max)*r.row}</b>.`;
+  }else if(b.last&&r.steps>b.last.steps){
+    title="Besser als letztes Mal";msg=`Bis <b>${reached}</b>, letztes Mal bis ${b.last.reached}. Rekord bleibt ${b.record*r.row}.`;
+  }else{
+    title=`Bis ${reached}`;msg=`Rekord bei ${r.bpm} BPM bleibt <b>${b.record*r.row}</b>. Morgen wieder!`;
+  }
+  if(r.failed)msg+=`<br><b style="color:var(--stop)">Noch nicht gespeichert.</b> Tippe auf Fertig, um es nochmal zu versuchen.`;
+  $("resTitle").textContent=title;$("resMsg").innerHTML=msg;
+  $("resCard").classList.toggle("win",win);
+  $("adjVal").textContent=reached;$("adjSub").textContent=`${r.steps} von ${max} · Stopp zu spät? Hier korrigieren`;
+  $("result").hidden=false;$("resDone").focus();
+}
+$("adjDown").onclick=()=>{if(!res)return;res.steps=Math.max(0,res.steps-1);showResult()};
+$("adjUp").onclick=()=>{if(!res)return;res.steps=Math.min(res.maxSteps,res.steps+1);showResult()};
+$("resDone").onclick=async()=>{
+  if(!res)return;const r=res;
+  if(r.steps!==r.saved||r.failed){const ok=await store.put(r);if(!ok){r.failed=true;showResult();return;}}
+  res=null;$("result").hidden=true;render();
+};
+$("resDiscard").onclick=async()=>{if(!res)return;const id=res.id;res=null;$("result").hidden=true;await store.del(id);toast("Versuch gelöscht.");};
+
+init();
+</script>
+</body>
+</html>
