@@ -736,7 +736,7 @@ function writeErr(e){
 /* Google-Tabelle als Speicher (für die Version auf GitHub Pages).
    Alles landet sofort im Gerätespeicher und in einer Warteschlange; die Warteschlange wird
    an die Tabelle geschickt, sobald Netz da ist. */
-const SHEET_URL="";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxXg-sxCHWfbYn8DM17Yls9m861ocFuprK4j4coM30f1Q0EXc9jM_QVc4SFZz-iY6Qa/exec";
 const USE_SHEET=!!SHEET_URL&&!location.hostname.endsWith("claude.ai")&&!location.hostname.endsWith("claudeusercontent.com");
 const LS_SHEET="einmaleins-sheet-v1";
 let sheetServer=[],sheetQueue=[],flushing=false,lastSync=null;
