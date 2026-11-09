@@ -934,7 +934,12 @@ async function sheetSync(){if(!auth)return;await sheetFlush();await sheetPull();
 let sheetStarted=false;
 function startSheet(){
   setPlayers(auth.players||[]);sel.player=null;trophyPlayer=null;
-  sheetLoadCache();sheetApply();
+  sheetLoadCache();
+  // results still waiting in the queue of the old single-family version move over to this family
+  try{const old=JSON.parse(localStorage.getItem("einmaleins-sheet-v1")||"null");
+    if(old&&Array.isArray(old.queue)&&old.queue.length&&auth.key==="schering"){sheetQueue=old.queue.filter(q=>q.action!=="config").concat(sheetQueue);sheetSave();}
+    localStorage.removeItem("einmaleins-sheet-v1");localStorage.removeItem("einmaleins-pin-v1");}catch(e){}
+  sheetApply();
   renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden geladen …";
   render();sheetStatus();sheetSync();
   if(sheetStarted)return;sheetStarted=true;
