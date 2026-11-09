@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Einmaleins-Metronom</title>
 <meta name="description" content="Die Familien-Challenge fürs Einmaleins: im Takt des Metronoms rechnen, Rekorde jagen, Medaillen und Urkunden sammeln.">
 <meta property="og:type" content="website">
@@ -40,6 +40,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+html,body,button,a{touch-action:manipulation}
+button,.tabs a{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
 body{padding:0 max(16px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:radial-gradient(120% 60% at 50% -10%, color-mix(in srgb,var(--pc,#7b93ff) 16%, transparent), transparent 70%) var(--bg);background-attachment:fixed;transition:background .4s}
 main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
@@ -1065,6 +1067,9 @@ $("resDone").onclick=async()=>{
 };
 $("resDiscard").onclick=async()=>{if(!res)return;const id=res.id;res=null;$("result").hidden=true;await store.del(id);toast("Versuch gelöscht.");};
 
+// No accidental zoom: touch-action:manipulation stops double-tap zoom without swallowing fast taps on +/−; pinch is ignored too
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
+["gesturestart","gesturechange"].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 init();
 </script>
 </body>
