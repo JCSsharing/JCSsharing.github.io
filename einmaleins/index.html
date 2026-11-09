@@ -31,7 +31,7 @@ header{padding-top:18px;display:flex;justify-content:space-between;align-items:c
 .brand{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
 .brand i{width:10px;height:10px;border-radius:50%;background:var(--pc,var(--ink));box-shadow:0 0 14px var(--pc,transparent);transition:background .3s}
 .tabs{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px}
-.tabs a{color:var(--muted);text-decoration:none;font-size:14.5px;font-weight:700;padding:7px 14px;border-radius:99px}
+.tabs a{color:var(--muted);text-decoration:none;font-size:14.5px;font-weight:700;padding:7px 11px;border-radius:99px}
 .tabs a[aria-current="page"]{background:var(--surface-2);color:var(--ink)}
 .tabs a:focus-visible{outline:2px solid var(--ink)}
 .banner{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14.5px;color:var(--muted)}
@@ -151,6 +151,71 @@ tr:last-child td{padding-bottom:12px}
 .actions button{flex:1;height:56px;border-radius:99px;font-size:17px;font-weight:700}
 .btn-main{background:var(--pc,var(--ink));color:var(--bg);border:none}
 .btn-ghost{background:none;border:1px solid var(--line);color:var(--muted)}
+/* Gamification */
+.rankline{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;margin-top:14px;text-align:left;width:100%}
+.rankline .ico{font-size:28px;line-height:1}
+.rankline .t{flex:1;min-width:0}
+.rankline .t b{font-family:var(--display);font-size:16px;font-weight:700}
+.rankline .t span{font-size:12.5px;color:var(--faint);margin-left:6px}
+.xpbar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.xpbar div{height:100%;background:var(--c,var(--pc));border-radius:99px;transition:width .6s}
+.pchips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pchip{--c:var(--muted);border:1px solid var(--line);background:var(--surface);border-radius:99px;height:44px;font-weight:700;color:var(--muted);font-size:14px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pchip[aria-pressed="true"]{background:var(--c);color:var(--bg);border-color:var(--c)}
+.hero{--c:var(--muted);background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--surface)),var(--surface) 70%);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.hero .top{display:flex;align-items:center;gap:14px}
+.hero .big{font-size:52px;line-height:1}
+.hero .rk{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.1}
+.hero .xp{color:var(--muted);font-size:14.5px;font-variant-numeric:tabular-nums}
+.hero .nx{font-size:13px;color:var(--faint);margin-top:2px}
+.medals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.medal{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px;text-align:left;width:100%}
+.medal svg{width:56px;height:56px;flex:none}
+.medal .mt{font-weight:700;font-size:14px;line-height:1.25;display:block}
+.medal .ms{font-size:12px;color:var(--faint);line-height:1.3;display:block;margin-top:2px}
+.medal.locked .mt{color:var(--muted)}
+.medal.has .ms{color:var(--mc)}
+.achs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ach{--c:var(--p-nala);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.ach .ai{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:color-mix(in srgb,var(--c) 18%,var(--surface-2));box-shadow:0 0 0 2px var(--c)}
+.ach.locked .ai{filter:grayscale(1);opacity:.28;box-shadow:none;background:var(--surface-2)}
+.ach .an{font-weight:700;font-size:13px;line-height:1.2}
+.ach.locked .an{color:var(--muted)}
+.ach .ad{font-size:11.5px;color:var(--faint);line-height:1.25}
+.certs{display:flex;flex-direction:column}
+.cert{display:flex;align-items:center;gap:12px;padding:10px 12px;border:none;border-bottom:1px solid var(--line);background:none;text-align:left;width:100%}
+.cert:last-child{border-bottom:none}
+.cert svg{width:40px;height:40px;flex:none}
+.cert .ct{flex:1;font-size:15px}
+.cert .ct span{display:block;font-size:12.5px;color:var(--faint)}
+.cert .go{color:var(--faint);font-size:20px}
+.ranking{display:flex;flex-direction:column}
+.rk-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.rk-row:last-child{border-bottom:none}
+.rk-row .pos{font-family:var(--display);font-weight:800;width:18px;color:var(--faint)}
+.rk-row .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:14px;color:var(--bg);background:var(--c);flex:none}
+.rk-row .nm{flex:1;font-size:15px}
+.rk-row .nm span{display:block;font-size:12.5px;color:var(--faint)}
+.rk-row .pts{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.gain{display:flex;flex-direction:column;gap:12px}
+.gain[hidden]{display:none}
+.xpchip{align-self:flex-start;background:color-mix(in srgb,var(--pc) 18%,var(--surface-2));color:var(--pc);font-weight:800;border-radius:99px;padding:4px 12px;font-size:14px;font-variant-numeric:tabular-nums}
+.newbadges{display:flex;gap:14px;flex-wrap:wrap}
+.nb{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:16px;padding:8px 12px 8px 8px;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both;font-size:14px}
+.nb:nth-child(2){animation-delay:.15s}.nb:nth-child(3){animation-delay:.3s}.nb:nth-child(4){animation-delay:.45s}
+.nb svg{width:46px;height:46px}
+.nb .ai{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:var(--surface)}
+.nb b{display:block;font-size:12px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+@keyframes pop{from{transform:scale(.3) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+.btn-cert{height:50px;border-radius:99px;border:1px solid var(--pc);background:none;color:var(--pc);font-weight:700}
+.certov{position:fixed;inset:0;z-index:35;background:rgba(5,6,10,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:14px}
+.certov[hidden]{display:none}
+.certov img{max-width:100%;max-height:70vh;border-radius:10px;box-shadow:0 20px 60px -20px #000;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+.certov .hint{color:var(--faint);font-size:13px;text-align:center}
+.certov .actions{width:100%;max-width:420px}
+.certov a.btn-main{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:99px;height:56px;flex:1;font-weight:700}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
+@media (prefers-reduced-motion: reduce){.nb,.certov img{animation:none}}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14.5px;font-weight:700;z-index:40;max-width:90vw;text-align:center}
 .toast[hidden]{display:none}
 </style>
@@ -158,9 +223,10 @@ tr:last-child td{padding-bottom:12px}
 <body>
 <main>
   <header>
-    <div class="brand"><i></i>Einmaleins</div>
+    <div class="brand"><i></i>1×1</div>
     <nav class="tabs" aria-label="Seiten">
       <a href="#spielen" id="tabPlay">Spielen</a>
+      <a href="#pokale" id="tabTrophy">Pokale</a>
       <a href="#statistik" id="tabStats">Statistik</a>
     </nav>
   </header>
@@ -171,6 +237,7 @@ tr:last-child td{padding-bottom:12px}
     <section>
       <div class="label"><b>1</b>Wer ist dran?</div>
       <div class="players" id="players"></div>
+      <button class="rankline" id="rankline" hidden></button>
     </section>
     <section>
       <div class="label"><b>2</b>Welche Reihe?</div>
@@ -187,6 +254,30 @@ tr:last-child td{padding-bottom:12px}
     <div class="goal" id="goal"></div>
     <button class="start" id="startBtn" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>Start</button>
     <div class="startsub" id="startSub">Erst Spieler und Reihe wählen</div>
+  </div>
+
+  <!-- PAGE: Pokale -->
+  <div class="view" id="viewTrophy" hidden>
+    <div class="pchips" id="pchips" role="group" aria-label="Wessen Pokale?"></div>
+    <div class="hero" id="hero"></div>
+    <section>
+      <div class="label">Medaillen pro Reihe</div>
+      <div class="medals" id="medals"></div>
+      <div class="legend">Bronze ab 60 BPM · Silber ab 80 · Gold ab 100 · Diamant ab 120. Jeweils die ganze Reihe ohne Fehler.</div>
+    </section>
+    <section>
+      <div class="label">Abzeichen</div>
+      <div class="achs" id="achs"></div>
+    </section>
+    <section>
+      <div class="label">Urkunden</div>
+      <div class="box certs" id="certs"></div>
+    </section>
+    <section>
+      <div class="label">Familien-Rangliste</div>
+      <div class="box ranking" id="ranking"></div>
+      <div class="legend">Punkte gibt es für jede richtige Zahl, jeden Spieltag, jeden neuen Rekord (+10), jedes neue Level (+50) und Serien ab 3 Tagen (+10 pro Tag).</div>
+    </section>
   </div>
 
   <!-- PAGE 2: Statistik -->
@@ -241,6 +332,11 @@ tr:last-child td{padding-bottom:12px}
   <div class="card" id="resCard" role="dialog" aria-modal="true" aria-labelledby="resTitle">
     <h2 id="resTitle">Gespeichert</h2>
     <div class="msg" id="resMsg"></div>
+    <div class="gain" id="resGain" hidden>
+      <span class="xpchip" id="resXp"></span>
+      <div class="newbadges" id="resNew"></div>
+      <button class="btn-cert" id="resCert" hidden>Urkunde ansehen</button>
+    </div>
     <div class="adjust">
       <button class="step" id="adjDown" aria-label="Eine Zahl weniger">−</button>
       <div class="val"><strong id="adjVal">0</strong><span id="adjSub">letzte richtige Zahl</span></div>
@@ -252,6 +348,16 @@ tr:last-child td{padding-bottom:12px}
     </div>
   </div>
 </div>
+<div class="certov" id="certov" hidden role="dialog" aria-modal="true" aria-label="Urkunde">
+  <img id="certImg" alt="Urkunde">
+  <div class="hint">Zum Speichern: Bild lange gedrückt halten oder unten auf Speichern tippen.</div>
+  <div class="actions">
+    <button class="btn-ghost" id="certClose">Schließen</button>
+    <button class="btn-main" id="certShare" hidden>Teilen</button>
+    <a class="btn-main" id="certSave" download="urkunde.png" href="#">Speichern</a>
+  </div>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -312,19 +418,208 @@ function streak(pid){
   return n;
 }
 
+/* ---------- Gamification ---------- */
+const CERT_HEX={jens:"#3653d6",heloisa:"#c23a80",amelie:"#0f8b78",nala:"#c2700c"};
+// Each row has its own creature; g = grammatical gender for the adjective ending
+const ROW_FUN={
+  1:{name:"Einser-Eichhörnchen",emoji:"🐿️",g:"n"}, 2:{name:"Zweier-Zebra",emoji:"🦓",g:"n"},
+  3:{name:"Dreier-Drache",emoji:"🐉",g:"m"}, 4:{name:"Vierer-Faultier",emoji:"🦥",g:"n"},
+  5:{name:"Fünfer-Fuchs",emoji:"🦊",g:"m"}, 6:{name:"Sechser-Seehund",emoji:"🦭",g:"m"},
+  7:{name:"Siebener-Schildkröte",emoji:"🐢",g:"f"}, 8:{name:"Achter-Adler",emoji:"🦅",g:"m"},
+  9:{name:"Neuner-Nashorn",emoji:"🦏",g:"n"}, 10:{name:"Zehner-Zauberer",emoji:"🧙",g:"m"}
+};
+const MEDALS=[
+  {id:"bronze",name:"Bronze",bpm:60,adj:"Klein",c1:"#e7a874",c2:"#9a5a2b"},
+  {id:"silber",name:"Silber",bpm:80,adj:"Flink",c1:"#eef2f7",c2:"#8a95a6"},
+  {id:"gold",name:"Gold",bpm:100,adj:"Golden",c1:"#ffdc6a",c2:"#c2870c"},
+  {id:"diamant",name:"Diamant",bpm:120,adj:"Legendär",c1:"#c4f4ff",c2:"#2f9cc4"}
+];
+const RANKS=[
+  {xp:0,name:"Rechen-Küken",emoji:"🐣"},{xp:60,name:"Zahlen-Flitzer",emoji:"🏃"},
+  {xp:200,name:"Takt-Tiger",emoji:"🐯"},{xp:450,name:"Einmaleins-Ninja",emoji:"🥷"},
+  {xp:800,name:"Rechen-Rakete",emoji:"🚀"},{xp:1300,name:"Metronom-Meister",emoji:"🎼"},
+  {xp:2000,name:"Einmaleins-Legende",emoji:"👑"}
+];
+const ACH=[
+  {id:"first",icon:"🎵",name:"Erster Takt",desc:"Die erste Runde gespielt"},
+  {id:"firstrow",icon:"🏁",name:"Durchgezogen",desc:"Eine ganze Reihe ohne Fehler"},
+  {id:"streak3",icon:"🔥",name:"Dranbleiber",desc:"3 Tage in Folge gespielt"},
+  {id:"streak7",icon:"📅",name:"Wochen-Held",desc:"7 Tage in Folge gespielt"},
+  {id:"early",icon:"🌅",name:"Frühstarter",desc:"5 Runden vor 8 Uhr"},
+  {id:"marathon",icon:"🏃",name:"Zahlen-Marathon",desc:"30 Zahlen in einem Lauf"},
+  {id:"hunter",icon:"🎯",name:"Rekordjäger",desc:"10 Rekorde verbessert"},
+  {id:"comeback",icon:"💪",name:"Comeback",desc:"Nach 3 Fehlversuchen doch Rekord"},
+  {id:"gold",icon:"🥇",name:"Goldrausch",desc:"Die erste Goldmedaille"},
+  {id:"turbo",icon:"⚡",name:"Turbo",desc:"Eine Reihe mit 120 BPM"},
+  {id:"allten",icon:"🏆",name:"Alle Zehn",desc:"Jede Reihe mindestens Bronze"},
+  {id:"family",icon:"🤝",name:"Familien-Runde",desc:"Am selben Tag wie alle anderen gespielt"}
+];
+function medalTitle(row,m){const f=ROW_FUN[row];const end=f.g==="m"?"er":f.g==="f"?"e":"es";return `${m.adj}${end} ${f.name}`}
+function dayGap(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5)}
+function rankFor(xp){let i=0;RANKS.forEach((r,k)=>{if(xp>=r.xp)i=k});return {i,rank:RANKS[i],next:RANKS[i+1]||null}}
+function gamify(pid,all){
+  const L=all.filter(a=>a.player===pid).sort((a,b)=>a.ts-b.ts);
+  let xp=0,records=0,early=0,run=0,lastDay=null;
+  const best={},miss={},unlocked={},medals={},ach={};
+  const earn=(k,d)=>{if(!ach[k])ach[k]=d};
+  const familyDays=(()=>{const m={};all.forEach(a=>{(m[a.date]=m[a.date]||new Set()).add(a.player)});return m})();
+  for(const a of L){
+    if(a.date!==lastDay){
+      run=(lastDay&&dayGap(lastDay,a.date)===1)?run+1:1;lastDay=a.date;xp+=5;
+      if(run>=3){xp+=10;earn("streak3",a.date)}
+      if(run>=7)earn("streak7",a.date);
+      if(familyDays[a.date]&&familyDays[a.date].size>=PLAYERS.length)earn("family",a.date);
+    }
+    xp+=a.steps;earn("first",a.date);
+    const k=a.row+"@"+a.bpm;
+    if(best[k]==null){best[k]=a.steps;miss[k]=0}
+    else if(a.steps>best[k]){xp+=10;records++;if(miss[k]>=3)earn("comeback",a.date);best[k]=a.steps;miss[k]=0}
+    else miss[k]++;
+    if(records>=10)earn("hunter",a.date);
+    if(a.ts&&new Date(a.ts).getHours()<8&&++early>=5)earn("early",a.date);
+    if(a.steps>=30)earn("marathon",a.date);
+    if(a.complete){
+      earn("firstrow",a.date);
+      if(unlocked[a.row]==null||a.bpm>unlocked[a.row]){xp+=50;unlocked[a.row]=a.bpm}
+      MEDALS.forEach(m=>{if(a.bpm>=m.bpm){medals[a.row]=medals[a.row]||{};if(!medals[a.row][m.id])medals[a.row][m.id]=a.date}});
+      if(a.bpm>=120)earn("turbo",a.date);
+      if(medals[a.row].gold)earn("gold",a.date);
+      if(ROWS.every(r=>medals[r]&&medals[r].bronze))earn("allten",a.date);
+    }
+  }
+  const top={};ROWS.forEach(r=>{const got=MEDALS.filter(m=>medals[r]&&medals[r][m.id]);top[r]=got.length?got[got.length-1]:null});
+  return {xp,ach,medals,top,unlocked,...rankFor(xp)};
+}
+let medalUid=0;
+function medalSVG(row,m){
+  const id="mg"+(++medalUid);const c1=m?m.c1:"#3b3f54",c2=m?m.c2:"#262a3a";
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>
+  <path d="M21 42 15 62l9-5 6 6 2-19Z" fill="${c2}"/><path d="M43 42l6 20-9-5-6 6-2-19Z" fill="${c2}"/>
+  <circle cx="32" cy="28" r="26" fill="url(#${id})"/><circle cx="32" cy="28" r="19.5" fill="#191b26"/>
+  <text x="32" y="29" text-anchor="middle" dominant-baseline="central" font-size="21"${m?"":` opacity=".35"`}>${ROW_FUN[row].emoji}</text></svg>`;
+}
+let trophyPlayer=null;
+function renderRankline(){
+  const el=$("rankline");
+  if(!sel.player){el.hidden=true;return}
+  const g=gamify(sel.player,attempts),pct=g.next?Math.round((g.xp-g.rank.xp)/(g.next.xp-g.rank.xp)*100):100;
+  el.hidden=false;
+  el.innerHTML=`<span class="ico">${g.rank.emoji}</span><span class="t"><b>${g.rank.name}</b><span>${g.xp} Punkte${g.next?` · noch ${g.next.xp-g.xp} bis ${g.next.name}`:""}</span><div class="xpbar"><div style="width:${pct}%"></div></div></span>`;
+}
+$("rankline").onclick=()=>{trophyPlayer=sel.player;location.hash="#pokale"};
+function renderTrophy(){
+  const pid=trophyPlayer||sel.player||"amelie";
+  $("pchips").innerHTML=PLAYERS.map(p=>`<button class="pchip" style="--c:${pcol(p.id)}" data-tp="${p.id}" aria-pressed="${p.id===pid}">${p.name.split(" ")[0]}</button>`).join("");
+  const p=player(pid),g=gamify(pid,attempts),col=pcol(pid);
+  const pct=g.next?Math.round((g.xp-g.rank.xp)/(g.next.xp-g.rank.xp)*100):100;
+  const nMed=ROWS.reduce((n,r)=>n+(g.medals[r]?Object.keys(g.medals[r]).length:0),0);
+  $("hero").style.setProperty("--c",col);
+  $("hero").innerHTML=`<div class="top"><span class="big">${g.rank.emoji}</span><div><div class="rk">${g.rank.name}</div><div class="xp">${p.name} · ${g.xp} Punkte · ${nMed} Medaillen · ${Object.keys(g.ach).length} Abzeichen</div></div></div>
+    <div class="xpbar" style="--c:${col}"><div style="width:${pct}%"></div></div><div class="nx">${g.next?`Noch ${g.next.xp-g.xp} Punkte bis ${g.next.emoji} ${g.next.name}`:"Höchster Rang erreicht!"}</div>`;
+  $("medals").innerHTML=ROWS.map(r=>{
+    const m=g.top[r],nextM=MEDALS.find(x=>!(g.medals[r]&&g.medals[r][x.id]));
+    const title=m?medalTitle(r,m):ROW_FUN[r].name;
+    const sub=m?`${m.name} · ${r}er-Reihe${nextM?` · ${nextM.name} ab ${nextM.bpm} BPM`:" · höchste Stufe"}`:`Bronze: ${r}er-Reihe bei 60 BPM schaffen`;
+    return `<button class="medal ${m?"has":"locked"}" style="--mc:${m?m.c1:"var(--faint)"}" ${m?`data-cert="${r}|${m.id}"`:"disabled"}>${medalSVG(r,m)}<span><span class="mt">${title}</span><span class="ms">${sub}</span></span></button>`;
+  }).join("");
+  $("achs").innerHTML=ACH.map(a=>{const d=g.ach[a.id];return `<div class="ach ${d?"":"locked"}" style="--c:${col}"><span class="ai">${a.icon}</span><span class="an">${a.name}</span><span class="ad">${d?"✓ "+fmtShort(d):a.desc}</span></div>`}).join("");
+  const certs=[];ROWS.forEach(r=>MEDALS.forEach(m=>{const d=g.medals[r]&&g.medals[r][m.id];if(d)certs.push({r,m,d})}));
+  certs.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:b.m.bpm-a.m.bpm);
+  $("certs").innerHTML=certs.length?certs.map(c=>`<button class="cert" data-cert="${c.r}|${c.m.id}">${medalSVG(c.r,c.m)}<span class="ct">${medalTitle(c.r,c.m)}<span>${c.m.name} · ${c.r}er-Reihe · ${fmtShort(c.d)}</span></span><span class="go">›</span></button>`).join(""):`<div class="empty" style="border:none">Die erste Urkunde gibt es, sobald ${p.name} eine ganze Reihe ohne Fehler schafft.</div>`;
+  const list=PLAYERS.map(pp=>({pp,g:gamify(pp.id,attempts)})).sort((a,b)=>b.g.xp-a.g.xp);
+  $("ranking").innerHTML=list.map((x,i)=>`<div class="rk-row" style="--c:${pcol(x.pp.id)}"><span class="pos">${i+1}</span><span class="av">${x.pp.ini}</span><span class="nm">${x.pp.name}<span>${x.g.rank.emoji} ${x.g.rank.name}</span></span><span class="pts">${x.g.xp}</span></div>`).join("");
+}
+function fmtShort(s){return new Date(s+"T12:00:00").toLocaleDateString("de-DE",{day:"numeric",month:"short"})}
+$("pchips").addEventListener("click",e=>{const b=e.target.closest("[data-tp]");if(!b)return;trophyPlayer=b.dataset.tp;renderTrophy()});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-cert]");if(!b)return;
+  const [r,mid]=b.dataset.cert.split("|");
+  const pid=b.closest("#viewTrophy")?(trophyPlayer||sel.player||"amelie"):(res&&res.player)||sel.player;
+  openCert(pid,Number(r),mid);
+});
+
+/* Certificate drawn on a canvas, shown as an image so it can be long-pressed, saved or shared */
+async function makeCert(pid,row,mid,date){
+  const W=1080,H=1440,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+  try{await document.fonts.load("800 80px 'Bricolage Grotesque'");await document.fonts.load("400 30px 'Atkinson Hyperlegible'");}catch(e){}
+  const m=MEDALS.find(x=>x.id===mid),p=player(pid),f=ROW_FUN[row],ink="#23252f",soft="#777987";
+  const D="'Bricolage Grotesque',sans-serif",B="'Atkinson Hyperlegible',sans-serif";
+  g.fillStyle="#fbf7ef";g.fillRect(0,0,W,H);
+  // soft rays behind the medal
+  const cy=560;g.save();g.translate(W/2,cy);g.beginPath();g.arc(0,0,310,0,Math.PI*2);g.clip();
+  const rg=g.createRadialGradient(0,0,150,0,0,310);rg.addColorStop(0,m.c1+"88");rg.addColorStop(1,m.c1+"00");
+  for(let i=0;i<24;i++){g.rotate(Math.PI/12);if(i%2)continue;g.fillStyle=rg;g.beginPath();g.moveTo(0,0);g.lineTo(-50,-320);g.lineTo(50,-320);g.closePath();g.fill();}
+  g.restore();
+  g.strokeStyle=m.c2;g.lineWidth=16;g.strokeRect(36,36,W-72,H-72);
+  g.strokeStyle=m.c1;g.lineWidth=4;g.strokeRect(70,70,W-140,H-140);
+  g.textAlign="center";g.textBaseline="alphabetic";
+  g.fillStyle=m.c2;g.font=`800 34px ${D}`;
+  const word="URKUNDE";let x=W/2-((word.length-1)*46)/2;for(const ch of word){g.fillText(ch,x,190);x+=46}
+  g.fillStyle=soft;g.font=`400 30px ${B}`;g.fillText("Einmaleins-Metronom-Challenge",W/2,236);
+  // ribbons + medal
+  g.fillStyle=m.c2;
+  g.beginPath();g.moveTo(W/2-120,cy+120);g.lineTo(W/2-175,cy+330);g.lineTo(W/2-105,cy+290);g.lineTo(W/2-60,cy+345);g.lineTo(W/2-20,cy+170);g.closePath();g.fill();
+  g.beginPath();g.moveTo(W/2+120,cy+120);g.lineTo(W/2+175,cy+330);g.lineTo(W/2+105,cy+290);g.lineTo(W/2+60,cy+345);g.lineTo(W/2+20,cy+170);g.closePath();g.fill();
+  const gr=g.createLinearGradient(W/2-180,cy-180,W/2+180,cy+180);gr.addColorStop(0,m.c1);gr.addColorStop(1,m.c2);
+  g.fillStyle=gr;g.beginPath();g.arc(W/2,cy,185,0,Math.PI*2);g.fill();
+  g.fillStyle="#ffffff";g.beginPath();g.arc(W/2,cy,142,0,Math.PI*2);g.fill();
+  g.textBaseline="middle";g.font=`150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;g.fillText(f.emoji,W/2,cy+8);
+  g.textBaseline="alphabetic";
+  g.fillStyle=CERT_HEX[pid]||ink;g.font=`800 100px ${D}`;g.fillText(p.name,W/2,1010);
+  g.fillStyle=soft;g.font=`400 36px ${B}`;g.fillText("ist ab heute offiziell",W/2,1068);
+  let fs=78;const t=medalTitle(row,m);g.font=`800 ${fs}px ${D}`;while(g.measureText(t).width>W-200&&fs>40){fs-=2;g.font=`800 ${fs}px ${D}`}
+  g.fillStyle=ink;g.fillText(t,W/2,1160);
+  g.fillStyle=m.c2;g.font=`700 34px ${B}`;g.fillText(`${m.name}-Medaille · ${row}er-Reihe fehlerfrei mit ${m.bpm} BPM`,W/2,1222);
+  g.fillStyle=soft;g.font=`400 30px ${B}`;
+  g.fillText(new Date(date+"T12:00:00").toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"}),W/2-230,1330);
+  g.fillText("Spielleitung",W/2+230,1330);
+  g.strokeStyle="#c9c6bd";g.lineWidth=2;g.beginPath();g.moveTo(W/2-380,1290);g.lineTo(W/2-80,1290);g.moveTo(W/2+80,1290);g.lineTo(W/2+380,1290);g.stroke();
+  return c;
+}
+let certBlobUrl=null,certFile=null;
+async function openCert(pid,row,mid){
+  const g=gamify(pid,attempts.concat(res&&res.player===pid&&!attempts.some(a=>a.id===res.id)?[resAttempt()]:[]));
+  const date=(g.medals[row]&&g.medals[row][mid])||todayStr();
+  const c=await makeCert(pid,row,mid,date);
+  const url=c.toDataURL("image/png");$("certImg").src=url;
+  const fname=`Urkunde-${player(pid).name.replace(/\s/g,"")}-${row}er-${mid}.png`;
+  $("certSave").href=url;$("certSave").download=fname;
+  certFile=null;$("certShare").hidden=true;
+  c.toBlob(b=>{try{const f=new File([b],fname,{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]})){certFile=f;$("certShare").hidden=false}}catch(e){}});
+  $("certov").hidden=false;confetti(MEDALS.find(x=>x.id===mid).c1);
+}
+$("certClose").onclick=()=>{$("certov").hidden=true};
+$("certShare").onclick=async()=>{try{await navigator.share({files:[certFile],title:"Urkunde"})}catch(e){}};
+
+/* Confetti */
+function confetti(extra){
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const cv=$("confetti"),g=cv.getContext("2d"),W=cv.width=innerWidth*devicePixelRatio,H=cv.height=innerHeight*devicePixelRatio;
+  const cs=getComputedStyle(document.documentElement);
+  const cols=["--p-jens","--p-heloisa","--p-amelie","--p-nala"].map(v=>cs.getPropertyValue(v).trim()).concat(extra?[extra,extra]:[]);
+  const P=Array.from({length:140},()=>({x:W/2+(Math.random()-.5)*W*.3,y:H*.55,vx:(Math.random()-.5)*W*.022,vy:-(Math.random()*H*.028+H*.012),r:(Math.random()*6+4)*devicePixelRatio,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[Math.floor(Math.random()*cols.length)]}));
+  const t0=performance.now();
+  (function step(t){
+    g.clearRect(0,0,W,H);const age=(t-t0)/1000;
+    P.forEach(p=>{p.vy+=H*.0009;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;g.save();g.translate(p.x,p.y);g.rotate(p.a);g.globalAlpha=Math.max(0,1-age/3);g.fillStyle=p.c;g.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);g.restore()});
+    if(age<3)requestAnimationFrame(step);else g.clearRect(0,0,W,H);
+  })(t0);
+}
+
 /* ---------- Routing ---------- */
 function route(){
-  const stats=location.hash==="#statistik";
-  $("viewPlay").hidden=stats;$("viewStats").hidden=!stats;
-  $("tabPlay").setAttribute("aria-current",stats?"false":"page");
-  $("tabStats").setAttribute("aria-current",stats?"page":"false");
+  const v=location.hash==="#statistik"?"stats":location.hash==="#pokale"?"trophy":"play";
+  $("viewPlay").hidden=v!=="play";$("viewStats").hidden=v!=="stats";$("viewTrophy").hidden=v!=="trophy";
+  $("tabPlay").setAttribute("aria-current",v==="play"?"page":"false");
+  $("tabStats").setAttribute("aria-current",v==="stats"?"page":"false");
+  $("tabTrophy").setAttribute("aria-current",v==="trophy"?"page":"false");
 }
 window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
 
 /* ---------- Render ---------- */
 function render(){
   setPlayerColor();
-  renderPlayers();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();
+  renderPlayers();renderRankline();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();renderTrophy();
 }
 function renderPlayers(){
   $("players").innerHTML=PLAYERS.map(p=>`<button class="player" style="--c:${pcol(p.id)}" data-p="${p.id}" aria-pressed="${sel.player===p.id}"><span class="avatar">${p.ini}</span><span class="nm">${p.name}</span></button>`).join("");
@@ -640,6 +935,7 @@ async function finish(steps){
   const ok=await store.put(res);
   if(!ok&&res){res.failed=true;showResult();}
 }
+function resAttempt(){return norm(res.id,{player:res.player,row:res.row,bpm:res.bpm,steps:res.steps,maxSteps:res.maxSteps,date:res.date,ts:res.ts})}
 function showResult(){
   const r=res,b=r.before,p=player(r.player),max=r.maxSteps,reached=r.steps*r.row;
   let title,msg,win=false;
@@ -658,6 +954,23 @@ function showResult(){
   if(r.failed)msg+=`<br><b style="color:var(--stop)">Noch nicht gespeichert.</b> Tippe auf Fertig, um es nochmal zu versuchen.`;
   $("resTitle").textContent=title;$("resMsg").innerHTML=msg;
   $("resCard").classList.toggle("win",win);
+  // rewards: compare everything before and after this run
+  const without=attempts.filter(a=>a.id!==r.id);
+  const gb=gamify(r.player,without),ga=gamify(r.player,without.concat([resAttempt()]));
+  const items=[];
+  ROWS.forEach(row=>{const nw=MEDALS.filter(m=>ga.medals[row]&&ga.medals[row][m.id]&&!(gb.medals[row]&&gb.medals[row][m.id]));if(nw.length)items.push({type:"medal",row,m:nw[nw.length-1]})});
+  ACH.forEach(a=>{if(ga.ach[a.id]&&!gb.ach[a.id])items.push({type:"ach",a})});
+  if(ga.i>gb.i)items.push({type:"rank",rank:ga.rank});
+  const gain=ga.xp-gb.xp;
+  $("resXp").textContent=(gain>=0?"+":"")+gain+" Punkte · "+ga.rank.emoji+" "+ga.rank.name;
+  $("resNew").innerHTML=items.map(it=>it.type==="medal"?`<div class="nb">${medalSVG(it.row,it.m)}<span><b>${it.m.name}-Medaille</b>${medalTitle(it.row,it.m)}</span></div>`
+    :it.type==="ach"?`<div class="nb"><span class="ai">${it.a.icon}</span><span><b>Neues Abzeichen</b>${it.a.name}</span></div>`
+    :`<div class="nb"><span class="ai">${it.rank.emoji}</span><span><b>Neuer Rang</b>${it.rank.name}</span></div>`).join("");
+  const med=items.filter(i=>i.type==="medal").pop();
+  $("resCert").hidden=!med;
+  $("resCert").onclick=med?()=>openCert(r.player,med.row,med.m.id):null;
+  $("resGain").hidden=false;
+  if((win||items.length)&&!r.celebrated){r.celebrated=true;setTimeout(()=>confetti(med?med.m.c1:null),150)}
   $("adjVal").textContent=reached;$("adjSub").textContent=`${r.steps} von ${max} · Stopp zu spät? Hier korrigieren`;
   $("result").hidden=false;$("resDone").focus();
 }
