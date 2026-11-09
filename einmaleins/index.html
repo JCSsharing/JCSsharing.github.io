@@ -222,6 +222,7 @@ tr:last-child td{padding-bottom:12px}
 .rk-row .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:14px;color:var(--bg);background:var(--c);flex:none}
 .rk-row .nm{flex:1;font-size:15px}
 .rk-row .nm span{display:block;font-size:12.5px;color:var(--faint)}
+.rk-row.own{background:color-mix(in srgb,var(--c) 10%,transparent)}
 .rk-row .pts{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums}
 .gain{display:flex;flex-direction:column;gap:12px}
 .gain[hidden]{display:none}
@@ -257,7 +258,10 @@ tr:last-child td{padding-bottom:12px}
 .field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
 .field input,.pinputs input{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:400 17px var(--body);padding:0 14px;width:100%}
 .field input:focus,.pinputs input:focus{outline:2px solid var(--ink);outline-offset:1px}
-.pinputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pinputs{display:flex;flex-direction:column;gap:8px}
+.prow{display:grid;grid-template-columns:1fr 172px;gap:8px}
+.prow input[type=month]{font-size:15px;padding:0 10px;color-scheme:dark}
+.hint2{font-size:12.5px;font-weight:400;color:var(--faint)}
 .linkbtn{background:none;border:none;color:var(--ink);font-weight:700;font-size:14px;text-align:left;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
 .linkbtn[hidden]{display:none}
 .gbtn{height:54px;border-radius:99px;font-size:17px;font-weight:700;margin-top:4px}
@@ -329,6 +333,12 @@ tr:last-child td{padding-bottom:12px}
       <div class="box ranking" id="ranking"></div>
       <div class="legend">Punkte gibt es für jede richtige Zahl, jeden Spieltag, jeden neuen Rekord (+10), jedes neue Level (+50) und Serien ab 3 Tagen (+10 pro Tag).</div>
     </section>
+    <section id="globalSec" hidden>
+      <div class="label">Globale Wertung · alle Familien</div>
+      <div class="seg lvseg" id="globalModes" role="group" aria-label="Wertung"></div>
+      <div class="box ranking" id="globalList"></div>
+      <div class="legend">Wie ein Handicap im Golf: Die Punkte werden mit einem Altersfaktor multipliziert. 6 Jahre ×2, 7 ×1,75, 8 ×1,5, 9 ×1,3, 10 ×1,15, 11 ×1,05, 12–13 ×1, 14–17 ×0,9, Erwachsene ×0,75. „Diese Woche“ zählt die Punkte seit Montag, „Können“ die geschafften Level, schwere Reihen zählen mehr. <button class="linkbtn" id="globalRefresh" style="display:inline;font-size:13px">Aktualisieren</button></div>
+    </section>
   </div>
 
   <!-- PAGE 2: Statistik -->
@@ -350,7 +360,7 @@ tr:last-child td{padding-bottom:12px}
     <section id="famSection" hidden>
       <div class="label" id="famLabel">Familie</div>
       <div class="box famcard">
-        <div class="field">Spieler (Vornamen)
+        <div class="field">Spieler: Vorname und Geburtsmonat<span class="hint2">Für das Alters-Handicap in der globalen Wertung. Andere Familien sehen nur Vorname, Alter und den ersten Buchstaben des Familiennamens.</span>
           <div class="pinputs" id="fPlayers"></div>
           <button type="button" class="linkbtn" id="fAdd">+ weiteren Spieler</button>
         </div>
@@ -443,7 +453,7 @@ tr:last-child td{padding-bottom:12px}
       <label class="field">Familienname<input id="rFam" autocomplete="username" autocapitalize="words" placeholder="z. B. Schmidt aus Fürth" required></label>
       <label class="field">Passwort (mindestens 6 Zeichen)<input id="rPw" type="password" autocomplete="new-password" required></label>
       <label class="field">Passwort wiederholen<input id="rPw2" type="password" autocomplete="new-password" required></label>
-      <div class="field">Spieler (nur Vornamen oder Spitznamen)
+      <div class="field">Spieler: Vorname und Geburtsmonat<span class="hint2">Der Geburtsmonat ist für das Alters-Handicap in der globalen Wertung. Andere sehen nur das Alter.</span>
         <div class="pinputs" id="rPlayers"></div>
         <button type="button" class="linkbtn" id="rAdd">+ weiteren Spieler</button>
       </div>
@@ -461,7 +471,7 @@ const MAX_PLAYERS=6;
 let PLAYERS=[],PID=[];
 function cleanName(s){return String(s||"").replace(/[<>&"'`\\]/g,"").replace(/\s+/g," ").trim().slice(0,20)}
 function setPlayers(list){
-  PLAYERS=(list||[]).slice(0,8).map((p,i)=>{const n=cleanName(p.name)||"?";return {id:String(p.id),name:n,ini:n[0].toUpperCase(),color:COLORS[i%COLORS.length][0],hex:COLORS[i%COLORS.length][1]}});
+  PLAYERS=(list||[]).slice(0,8).map((p,i)=>{const n=cleanName(p.name)||"?";return {id:String(p.id),name:n,birth:/^\d{4}-\d{2}$/.test(p.birth||"")?p.birth:"",ini:n[0].toUpperCase(),color:COLORS[i%COLORS.length][0],hex:COLORS[i%COLORS.length][1]}});
   PID=PLAYERS.map(p=>p.id);
   if(typeof sel!=="undefined"&&sel.player&&!PID.includes(sel.player))sel.player=null;
 }
@@ -527,6 +537,53 @@ function streak(pid){
   let n=0;while(days.has(todayStr(d))){n++;d=new Date(d.getTime()-864e5)}
   return n;
 }
+
+/* ---------- Global ranking with age handicap ---------- */
+// Like a golf handicap: younger players get a bigger factor, so a 6-year-old can beat a 12-year-old.
+const HCP=[[5,2.2],[6,2.0],[7,1.75],[8,1.5],[9,1.3],[10,1.15],[11,1.05],[13,1.0],[17,0.9]];
+function ageFrom(birth){if(!/^\d{4}-\d{2}$/.test(birth||""))return null;const n=new Date(),y=+birth.slice(0,4),m=+birth.slice(5,7);return n.getFullYear()-y-((n.getMonth()+1)<m?1:0)}
+function hcpFor(age){if(age==null)return 1;for(const [a,f] of HCP)if(age<=a)return f;return 0.75}
+function fmtF(f){return "×"+f.toFixed(2).replace(/0$/,"").replace(".",",")}
+function weekStart(d=new Date()){const x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return todayStr(x)}
+function rowWeight(r){return r>10?2:[1,2,5,10].includes(r)?1:1.5}
+// Können: every unlocked level counts, plus the share of the current level already reached; harder rows weigh more
+function skillScore(pid){
+  let sc=0;
+  ROWS.forEach(r=>{const s=statsFor(pid,r);const lv=s.unlocked!=null?(s.unlocked-startBpm(r))/STEP_BPM+1:0;
+    const part=s.record!=null&&s.at.length?Math.min(1,s.record/(s.at[0].maxSteps||10)):0;sc+=rowWeight(r)*(lv+part)*10});
+  return Math.round(sc);
+}
+function weekPoints(pid){const ws=weekStart();const before=attempts.filter(a=>a.date<ws);return gamify(pid,attempts).xp-gamify(pid,before).xp}
+let lastScoresSig="";
+async function pushScores(){
+  if(!auth||!PLAYERS.length)return;
+  const scores=PLAYERS.map(p=>({id:p.id,skill:skillScore(p.id),week:weekPoints(p.id),weekStart:weekStart()}));
+  const sig=JSON.stringify(scores);if(sig===lastScoresSig)return;
+  try{const j=await api({action:"scores",key:auth.key,token:auth.token,scores});if(j.ok){lastScoresSig=sig;globalData.at=0}}catch(e){}
+}
+const globalData={list:null,at:0,mode:"week",loading:false};
+async function loadGlobal(force){
+  if(!USE_SHEET||!auth||globalData.loading)return;
+  if(!force&&globalData.list&&Date.now()-globalData.at<60000)return;
+  globalData.loading=true;renderGlobal();
+  try{await pushScores();const j=await api({action:"global",key:auth.key,token:auth.token});if(j.ok){globalData.list=j.players;globalData.at=Date.now()}}catch(e){}
+  globalData.loading=false;renderGlobal();
+}
+function renderGlobal(){
+  const sec=$("globalSec");if(!sec)return;sec.hidden=!(USE_SHEET&&auth);if(sec.hidden)return;
+  $("globalModes").innerHTML=[["week","Diese Woche"],["skill","Können"]].map(([k,t])=>`<button data-gm="${k}" aria-pressed="${globalData.mode===k}">${t}</button>`).join("");
+  const el=$("globalList");
+  if(!globalData.list){el.innerHTML=`<div class="empty" style="border:none">${globalData.loading?"Rangliste wird geladen …":"Keine Verbindung zur Rangliste."}</div>`;return}
+  const ws=weekStart();
+  const rows=globalData.list.map(p=>{const raw=globalData.mode==="week"?(p.weekStart===ws?p.week:0):p.skill;const f=hcpFor(p.age);return {...p,raw,f,score:Math.round(raw*f)}})
+    .filter(p=>p.raw>0).sort((a,b)=>b.score-a.score).slice(0,50);
+  if(!rows.length){el.innerHTML=`<div class="empty" style="border:none">${globalData.mode==="week"?"Diese Woche hat noch niemand gespielt.":"Noch keine Wertung."}</div>`;return}
+  el.innerHTML=rows.map((p,i)=>{const me=p.own?PLAYERS.find(x=>x.id===p.id):null;
+    return `<div class="rk-row${p.own?" own":""}" style="--c:${me?pcol(me.id):"var(--faint)"}"><span class="pos">${i<3?["🥇","🥈","🥉"][i]:i+1}</span><span class="av">${cleanName(p.name)[0]||"?"}</span>
+    <span class="nm">${cleanName(p.name)}${p.age!=null?` (${p.age})`:""}<span>Familie ${cleanName(p.fam)} · ${p.raw} Pkt ${fmtF(p.f)}${p.age==null?" · Alter fehlt":""}</span></span><span class="pts">${p.score}</span></div>`}).join("");
+}
+$("globalModes").addEventListener("click",e=>{const b=e.target.closest("[data-gm]");if(!b)return;globalData.mode=b.dataset.gm;renderGlobal()});
+$("globalRefresh").onclick=()=>loadGlobal(true);
 
 /* ---------- Gamification ---------- */
 // Each row has its own creature; g = grammatical gender for the adjective ending
@@ -734,12 +791,12 @@ function route(){
   $("tabStats").setAttribute("aria-current",v==="stats"?"page":"false");
   $("tabTrophy").setAttribute("aria-current",v==="trophy"?"page":"false");
 }
-window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
+window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0);if(location.hash==="#pokale")loadGlobal()});
 
 /* ---------- Render ---------- */
 function render(){
   setPlayerColor();
-  renderPlayers();renderRankline();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();renderTrophy();renderFamily();
+  renderPlayers();renderRankline();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();renderTrophy();renderFamily();renderGlobal();
 }
 function renderPlayers(){
   $("players").innerHTML=PLAYERS.map(p=>`<button class="player" style="--c:${pcol(p.id)}" data-p="${p.id}" aria-pressed="${sel.player===p.id}"><span class="avatar">${p.ini}</span><span class="nm">${p.name}</span></button>`).join("");
@@ -912,6 +969,7 @@ async function sheetFlush(){
       else if(op.action==="del")sheetServer=sheetServer.filter(x=>x.id!==op.id);
       sheetSave();
     }
+    pushScores();
   }catch(e){}finally{flushing=false;sheetStatus();}
 }
 function applyFamily(f){
@@ -927,6 +985,7 @@ async function sheetPull(){
     applyFamily(j.family);
     sheetServer=(j.attempts||[]).map(a=>norm(a.id,a)).filter(Boolean);
     lastSync=Date.now();sheetSave();sheetApply();renderLog.loading=null;render();
+    pushScores();
   }catch(e){}
   sheetStatus();
 }
@@ -942,6 +1001,7 @@ function startSheet(){
   sheetApply();
   renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden geladen …";
   render();sheetStatus();sheetSync();
+  if(location.hash==="#pokale")loadGlobal(true);
   if(sheetStarted)return;sheetStarted=true;
   setInterval(()=>{if(document.visibilityState==="visible")sheetSync()},30000);
   window.addEventListener("online",sheetSync);
@@ -960,11 +1020,13 @@ function playerInputs(el,list,addBtn){
 }
 function addPlayerInput(el,p,addBtn){
   if(el.children.length>=MAX_PLAYERS)return;
-  const i=document.createElement("input");i.placeholder="Spieler "+(el.children.length+1);i.maxLength=20;i.autocapitalize="words";i.id=el.id+"-"+el.children.length;
-  if(p){i.value=p.name;i.dataset.pid=p.id}
-  el.appendChild(i);addBtn.hidden=el.children.length>=MAX_PLAYERS;
+  const k=el.children.length,row=document.createElement("div");row.className="prow";
+  const i=document.createElement("input");i.placeholder="Vorname "+(k+1);i.maxLength=20;i.autocapitalize="words";i.id=el.id+"-"+k;i.setAttribute("aria-label","Vorname Spieler "+(k+1));
+  const b=document.createElement("input");b.type="month";b.id=el.id+"-b"+k;b.max=todayStr().slice(0,7);b.min="1920-01";b.setAttribute("aria-label","Geburtsmonat Spieler "+(k+1));
+  if(p){i.value=p.name;row.dataset.pid=p.id;b.value=p.birth||""}
+  row.append(i,b);el.appendChild(row);addBtn.hidden=el.children.length>=MAX_PLAYERS;
 }
-function readPlayers(el){return [...el.children].map(i=>({id:i.dataset.pid||undefined,name:cleanName(i.value)})).filter(p=>p.name)}
+function readPlayers(el){return [...el.children].map(r=>{const [i,b]=r.querySelectorAll("input");return {id:r.dataset.pid||undefined,name:cleanName(i.value),birth:/^\d{4}-\d{2}$/.test(b.value)?b.value:""}}).filter(p=>p.name)}
 function showGate(msg){$("gate").hidden=false;gateTab(false);if(msg)gateMsg(msg,true);playerInputs($("rPlayers"),[],$("rAdd"));}
 function logout(msg){auth=null;saveAuth();attempts=[];sheetServer=[];sheetQueue=[];setPlayers([]);render();showGate(msg);}
 function shake(){const c=$("gateCard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}
@@ -991,7 +1053,7 @@ $("regForm").addEventListener("submit",e=>{e.preventDefault();
   if(pw.length<6){gateMsg(AUTH_ERR.password,true);return}
   if(pw!==$("rPw2").value){gateMsg("Die beiden Passwörter sind nicht gleich.",true);return}
   if(!players.length){gateMsg(AUTH_ERR.players,true);return}
-  gateSubmit({action:"register",family:fam,password:pw,players:players.map(p=>p.name)},e.submitter||$("regForm").querySelector("button"));});
+  gateSubmit({action:"register",family:fam,password:pw,players:players.map(p=>({name:p.name,birth:p.birth}))},e.submitter||$("regForm").querySelector("button"));});
 
 /* Family settings in Statistik */
 function renderFamily(){
