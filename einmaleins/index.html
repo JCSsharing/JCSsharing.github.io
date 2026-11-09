@@ -76,6 +76,12 @@ header{padding-top:calc(18px + env(safe-area-inset-top));display:flex;justify-co
 .row{background:var(--surface);border:1px solid var(--line);border-radius:14px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}
 .row .n{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1}
 .rows.few{grid-template-columns:1fr 1fr}
+.rows.four{grid-template-columns:repeat(4,1fr)}
+.lvgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.lvgrid button{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-weight:700;font-size:14.5px;padding:4px 8px}
+.lvgrid button.quiz{border-style:dashed}
+.lvgrid button.wide{grid-column:1/-1}
+.lvgrid button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);border:1px solid var(--ink)}
 .lvseg{margin:0 0 10px}
 .lvseg button{font-size:13.5px;height:40px;padding:0 6px}
 .lvlhead{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
@@ -159,6 +165,23 @@ tr:last-child td{padding-bottom:12px}
 .stop{min-height:26vh;border:none;border-radius:28px;background:var(--stop);color:#fff;font-family:var(--display);font-weight:800;font-size:42px;letter-spacing:.02em;line-height:1.1;box-shadow:0 14px 40px -12px var(--stop)}
 .stop small{display:block;font-family:var(--body);font-weight:400;font-size:16px;letter-spacing:0;opacity:.9}
 @media (prefers-reduced-motion: reduce){.bignum,.avatar{transition:none}.bignum.pulse{transform:none}}
+
+/* Rechenspiel */
+.quizst .qdots{display:flex;gap:6px;justify-content:center}
+.qdots i{width:22px;height:8px;border-radius:99px;background:var(--surface-2)}
+.qdots i.ok{background:#46d38f}.qdots i.no{background:var(--stop)}.qdots i.cur{background:var(--pc)}
+.qcount{font-size:15px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+.qtask{font-family:var(--display);font-weight:800;font-size:clamp(64px,22vw,140px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.qans{font-family:var(--display);font-weight:800;font-size:clamp(90px,34vw,220px);line-height:.95;color:var(--pc);font-variant-numeric:tabular-nums;animation:pop .35s ease-out both}
+.qans[hidden]{display:none}
+.qtimer{width:min(420px,90%);height:12px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:14px}
+.qtimer div{height:100%;width:100%;background:var(--pc);border-radius:99px}
+.qtimer div.late{background:var(--stop)}
+.qreveal{min-height:64px;border-radius:20px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:18px}
+.qreveal[hidden],.qbtns[hidden]{display:none}
+.qbtns{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:24vh}
+.qbtns button{border:none;border-radius:24px;font-family:var(--display);font-weight:800;font-size:30px;color:#fff}
+.qno{background:var(--stop)}.qyes{background:#2fb874}
 
 /* Result sheet */
 .result{position:fixed;inset:0;z-index:30;background:rgba(5,6,10,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
@@ -295,10 +318,10 @@ tr:last-child td{padding-bottom:12px}
     </section>
     <section>
       <div class="label"><b>2</b>Welche Reihe?</div>
-      <div class="seg lvseg" id="levels" role="group" aria-label="Spielebene"></div>
+      <div class="lvgrid" id="levels" role="group" aria-label="Spielebene"></div>
       <div class="rows" id="rows"></div>
     </section>
-    <section>
+    <section id="tempoSec">
       <div class="label"><b>3</b>Tempo</div>
       <div class="tempo">
         <button class="step" id="bpmDown" aria-label="5 BPM langsamer">−</button>
@@ -375,6 +398,7 @@ tr:last-child td{padding-bottom:12px}
       <div class="label">Spielregeln</div>
       <div class="box rules">
         <ol>
+          <li><b>Rechenspiel:</b> 10 Aufgaben werden vorgelesen. Bis zum Buzzer muss die Antwort gesagt sein, dann zeigt die App das Ergebnis und der Spielleiter tippt auf Richtig oder Falsch. Medaillen gibt es für 10 von 10: Bronze auf Leicht, Silber auf Mittel, Gold auf Schwer, Diamant auf Profi.</li>
           <li>Drei Spielebenen: <b>kleines 1×1</b> (1er bis 10er), <b>großes 1×1</b> (11er bis 20er) und <b>Quadratzahlen</b> (1², 4², 9² …). Das kleine 1×1 startet bei <b>60 BPM</b>, großes 1×1 und Quadratzahlen bei <b>40 BPM</b>.</li>
           <li>Jede Reihe startet auf dem Start-Tempo ihrer Ebene. Nach 4 Vorzähl-Ticks kommt auf jeden Schlag die nächste Zahl.</li>
           <li>Wer die Reihe <b id="ruleGoal">bis ×10</b> ohne Fehler schafft, schaltet das nächste Level frei: <b>10 BPM schneller</b>.</li>
@@ -403,6 +427,26 @@ tr:last-child td{padding-bottom:12px}
     <div class="beatdots" id="stDots"><i></i><i></i><i></i><i></i></div>
   </div>
   <button class="stop" id="stStop">STOPP<small>beim ersten Fehler drücken</small></button>
+</div>
+
+<div class="stage quizst" id="quiz" hidden>
+  <div class="top">
+    <div class="who" id="qWho">–</div>
+    <button class="cancel" id="qCancel">Abbrechen</button>
+  </div>
+  <div class="qdots" id="qDots"></div>
+  <div class="center">
+    <div class="qcount" id="qCount">Aufgabe 1 von 10</div>
+    <div class="qtask" id="qTask">7 × 8</div>
+    <div class="qans" id="qAns" hidden>56</div>
+    <div class="qtimer"><div id="qTimer"></div></div>
+    <div class="eq" id="qHint">Zuhören …</div>
+  </div>
+  <button class="qreveal" id="qReveal">Schon gesagt: aufdecken</button>
+  <div class="qbtns" id="qJudge" hidden>
+    <button class="qno" id="qWrong">✗ Falsch</button>
+    <button class="qyes" id="qRight">✓ Richtig</button>
+  </div>
 </div>
 
 <div class="result" id="result" hidden>
@@ -482,12 +526,25 @@ const LEVELS=[
   {id:"quadrat",name:"Quadratzahlen",rows:[101,102],start:40}
 ];
 const ROWS=LEVELS.flatMap(l=>l.rows);
+// Rechenspiele: 201 = kleines 1×1, 202 = großes 1×1. Im Datensatz steht bei "bpm" die Bedenkzeit in Sekunden, bei "steps" die richtigen Antworten.
+const QUIZ={201:{name:"Rechenspiel kleines 1×1",short:"Rechenspiel klein",secs:[8,5,3,2]},202:{name:"Rechenspiel großes 1×1",short:"Rechenspiel groß",secs:[12,8,5,3]}};
+const DIFF=["Leicht","Mittel","Schwer","Profi"];
+const QUIZ_TASKS=10;
+function isQuiz(r){return r===201||r===202}
+const ALL_ROWS=ROWS.concat([201,202]);
+const MEDAL_GROUPS=LEVELS.map(l=>({name:l.name,rows:l.rows})).concat([{name:"Rechenspiele",rows:[201,202]}]);
+const PLAY_LEVELS=[{id:"klein",name:"Kleines 1×1"},{id:"qk",name:"Rechenspiel",quiz:201},{id:"gross",name:"Großes 1×1"},{id:"qg",name:"Rechenspiel",quiz:202},{id:"quadrat",name:"Quadratzahlen",wide:true}];
+function levelIdOf(row){return row===201?"qk":row===202?"qg":levelOf(row).id}
+function diffIndex(row,sec){const i=QUIZ[row].secs.indexOf(sec);return i<0?0:i}
+function tempoText(row,bpm){return isQuiz(row)?`${DIFF[diffIndex(row,bpm)]} (${bpm} s)`:`${bpm} BPM`}
+function quizLevel(pid,row){const L=attempts.filter(a=>a.player===pid&&a.row===row&&a.complete);let i=0;QUIZ[row].secs.forEach((s,k)=>{if(L.some(a=>a.bpm<=s))i=Math.min(k+1,3)});return i}
+function medalReq(row,m){const i=MEDALS.indexOf(m);return isQuiz(row)?`10 von 10 mit ${QUIZ[row].secs[i]} s`:`${medalBpm(row,m)} BPM`}
 function levelOf(row){return LEVELS.find(l=>l.rows.includes(row))||LEVELS[0]}
 function startBpm(row){return levelOf(row).start}
-function val(row,k){return row===101?k*k:row===102?(k+10)*(k+10):k*row}
+function val(row,k){return isQuiz(row)?k:row===101?k*k:row===102?(k+10)*(k+10):k*row}
 function eqText(row,k){return row===101?`${k} × ${k}`:row===102?`${k+10} × ${k+10}`:`${k} × ${row}`}
-function rowShort(row){return row===101?"1²–10²":row===102?"11²–20²":row+"er"}
-function rowLabel(row){return row===101?"Quadratzahlen 1–10":row===102?"Quadratzahlen 11–20":row+"er-Reihe"}
+function rowShort(row){return isQuiz(row)?QUIZ[row].short:row===101?"1²–10²":row===102?"11²–20²":row+"er"}
+function rowLabel(row){return isQuiz(row)?QUIZ[row].name:row===101?"Quadratzahlen 1–10":row===102?"Quadratzahlen 11–20":row+"er-Reihe"}
 const START_BPM=60, STEP_BPM=10, MIN_BPM=30, MAX_BPM=240;
 const LS_KEY="einmaleins-metronom-v1";
 
@@ -513,7 +570,7 @@ function setPlayerColor(){
 function norm(id,o){
   if(!o||!PID.includes(o.player))return null;
   const row=Number(o.row),bpm=Number(o.bpm),steps=Number(o.steps),maxSteps=Number(o.maxSteps),ts=Number(o.ts);
-  if(!ROWS.includes(row)||!Number.isFinite(bpm)||!Number.isFinite(steps)||!Number.isFinite(maxSteps))return null;
+  if(!ALL_ROWS.includes(row)||!Number.isFinite(bpm)||!Number.isFinite(steps)||!Number.isFinite(maxSteps))return null;
   const date=typeof o.date==="string"&&/^\d{4}-\d\d-\d\d$/.test(o.date)?o.date:todayStr(new Date(ts||Date.now()));
   return {id,player:o.player,row,bpm,steps,maxSteps,reached:val(row,steps),complete:steps>=maxSteps,date,ts:Number.isFinite(ts)?ts:0};
 }
@@ -551,6 +608,9 @@ function skillScore(pid){
   let sc=0;
   ROWS.forEach(r=>{const s=statsFor(pid,r);const lv=s.unlocked!=null?(s.unlocked-startBpm(r))/STEP_BPM+1:0;
     const part=s.record!=null&&s.at.length?Math.min(1,s.record/(s.at[0].maxSteps||10)):0;sc+=rowWeight(r)*(lv+part)*10});
+  [201,202].forEach(r=>{const L=attempts.filter(a=>a.player===pid&&a.row===r),secs=QUIZ[r].secs;let lv=0;
+    secs.forEach((x,i)=>{if(L.some(a=>a.complete&&a.bpm<=x))lv=i+1});
+    const nx=secs[lv],part=nx?Math.max(0,...L.filter(a=>a.bpm===nx).map(a=>a.steps))/QUIZ_TASKS:0;sc+=(r===201?1.5:2)*(lv+part)*10});
   return Math.round(sc);
 }
 function weekPoints(pid){const ws=weekStart();const before=attempts.filter(a=>a.date<ws);return gamify(pid,attempts).xp-gamify(pid,before).xp}
@@ -599,7 +659,8 @@ const ROW_FUN={
   15:{name:"Fünfzehner-Flamingo",emoji:"🦩",g:"m"}, 16:{name:"Sechzehner-Schnecke",emoji:"🐌",g:"f"},
   17:{name:"Siebzehner-Skorpion",emoji:"🦂",g:"m"}, 18:{name:"Achtzehner-Alpaka",emoji:"🦙",g:"n"},
   19:{name:"Neunzehner-Nilpferd",emoji:"🦛",g:"n"}, 20:{name:"Zwanziger-Einhorn",emoji:"🦄",g:"n"},
-  101:{name:"Quadrat-Qualle",emoji:"🪼",g:"f"}, 102:{name:"Quadrat-Krake",emoji:"🐙",g:"f"}
+  101:{name:"Quadrat-Qualle",emoji:"🪼",g:"f"}, 102:{name:"Quadrat-Krake",emoji:"🐙",g:"f"},
+  201:{name:"Blitzrechen-Gepard",emoji:"🐆",g:"m"}, 202:{name:"Kopfrechen-Krokodil",emoji:"🐊",g:"n"}
 };
 const MEDALS=[
   {id:"bronze",name:"Bronze",off:0,adj:"Klein",c1:"#e7a874",c2:"#9a5a2b"},
@@ -627,6 +688,7 @@ const ACH=[
   {id:"allten",icon:"🏆",name:"Alle Zehn",desc:"Jede Reihe im kleinen 1×1 mindestens Bronze"},
   {id:"gross",icon:"🧠",name:"Großer Denker",desc:"Erste Medaille im großen 1×1"},
   {id:"quadrat",icon:"🟪",name:"Quadrat-Profi",desc:"Erste Medaille bei den Quadratzahlen"},
+  {id:"blitz",icon:"🧮",name:"Kopfrechen-Ass",desc:"Ein Rechenspiel mit 10 von 10"},
   {id:"family",icon:"🤝",name:"Familien-Runde",desc:"Am selben Tag wie alle anderen gespielt"}
 ];
 function medalBpm(row,m){return startBpm(row)+m.off}
@@ -654,7 +716,12 @@ function gamify(pid,all){
     if(records>=10)earn("hunter",a.date);
     if(a.ts&&new Date(a.ts).getHours()<8&&++early>=5)earn("early",a.date);
     if(a.steps>=30)earn("marathon",a.date);
-    if(a.complete){
+    if(a.complete&&isQuiz(a.row)){
+      earn("blitz",a.date);
+      if(unlocked[a.row]==null||a.bpm<unlocked[a.row]){xp+=50;unlocked[a.row]=a.bpm}
+      MEDALS.forEach((m,i)=>{if(a.bpm<=QUIZ[a.row].secs[i]){medals[a.row]=medals[a.row]||{};if(!medals[a.row][m.id])medals[a.row][m.id]=a.date}});
+      if(medals[a.row]&&medals[a.row].gold)earn("gold",a.date);
+    }else if(a.complete){
       earn("firstrow",a.date);
       if(unlocked[a.row]==null||a.bpm>unlocked[a.row]){xp+=50;unlocked[a.row]=a.bpm}
       MEDALS.forEach(m=>{if(a.bpm>=medalBpm(a.row,m)){medals[a.row]=medals[a.row]||{};if(!medals[a.row][m.id])medals[a.row][m.id]=a.date}});
@@ -664,7 +731,7 @@ function gamify(pid,all){
       if(LEVELS[0].rows.every(r=>medals[r]&&medals[r].bronze))earn("allten",a.date);
     }
   }
-  const top={};ROWS.forEach(r=>{const got=MEDALS.filter(m=>medals[r]&&medals[r][m.id]);top[r]=got.length?got[got.length-1]:null});
+  const top={};ALL_ROWS.forEach(r=>{const got=MEDALS.filter(m=>medals[r]&&medals[r][m.id]);top[r]=got.length?got[got.length-1]:null});
   return {xp,ach,medals,top,unlocked,...rankFor(xp)};
 }
 let medalUid=0;
@@ -690,18 +757,18 @@ function renderTrophy(){
   $("pchips").innerHTML=PLAYERS.map(p=>`<button class="pchip" style="--c:${pcol(p.id)}" data-tp="${p.id}" aria-pressed="${p.id===pid}">${p.name.split(" ")[0]}</button>`).join("");
   const p=player(pid),g=gamify(pid,attempts),col=pcol(pid);
   const pct=g.next?Math.round((g.xp-g.rank.xp)/(g.next.xp-g.rank.xp)*100):100;
-  const nMed=ROWS.reduce((n,r)=>n+(g.medals[r]?Object.keys(g.medals[r]).length:0),0);
+  const nMed=ALL_ROWS.reduce((n,r)=>n+(g.medals[r]?Object.keys(g.medals[r]).length:0),0);
   $("hero").style.setProperty("--c",col);
   $("hero").innerHTML=`<div class="top"><span class="big">${g.rank.emoji}</span><div><div class="rk">${g.rank.name}</div><div class="xp">${p.name} · ${g.xp} Punkte · ${nMed} Medaillen · ${Object.keys(g.ach).length} Abzeichen</div></div></div>
     <div class="xpbar" style="--c:${col}"><div style="width:${pct}%"></div></div><div class="nx">${g.next?`Noch ${g.next.xp-g.xp} Punkte bis ${g.next.emoji} ${g.next.name}`:"Höchster Rang erreicht!"}</div>`;
-  $("medals").innerHTML=LEVELS.map(l=>`<div class="lvlhead">${l.name}</div>`+l.rows.map(r=>{
+  $("medals").innerHTML=MEDAL_GROUPS.map(l=>`<div class="lvlhead">${l.name}</div>`+l.rows.map(r=>{
     const m=g.top[r],nextM=MEDALS.find(x=>!(g.medals[r]&&g.medals[r][x.id]));
     const title=m?medalTitle(r,m):ROW_FUN[r].name;
-    const sub=m?`${m.name} · ${rowLabel(r)}${nextM?` · ${nextM.name} ab ${medalBpm(r,nextM)} BPM`:" · höchste Stufe"}`:`Bronze: ${rowLabel(r)} bei ${startBpm(r)} BPM schaffen`;
+    const sub=m?`${m.name} · ${rowLabel(r)}${nextM?` · ${nextM.name}: ${medalReq(r,nextM)}`:" · höchste Stufe"}`:isQuiz(r)?`Bronze: 10 von 10 mit ${QUIZ[r].secs[0]} s`:`Bronze: ${rowLabel(r)} bei ${startBpm(r)} BPM schaffen`;
     return `<button class="medal ${m?"has":"locked"}" style="--mc:${m?m.c1:"var(--faint)"}" ${m?`data-cert="${r}|${m.id}"`:"disabled"}>${medalSVG(r,m)}<span><span class="mt">${title}</span><span class="ms">${sub}</span></span></button>`;
   }).join("")).join("");
   $("achs").innerHTML=ACH.map(a=>{const d=g.ach[a.id];return `<div class="ach ${d?"":"locked"}" style="--c:${col}"><span class="ai">${a.icon}</span><span class="an">${a.name}</span><span class="ad">${d?"✓ "+fmtShort(d):a.desc}</span></div>`}).join("");
-  const certs=[];ROWS.forEach(r=>MEDALS.forEach(m=>{const d=g.medals[r]&&g.medals[r][m.id];if(d)certs.push({r,m,d})}));
+  const certs=[];ALL_ROWS.forEach(r=>MEDALS.forEach(m=>{const d=g.medals[r]&&g.medals[r][m.id];if(d)certs.push({r,m,d})}));
   certs.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:b.m.off-a.m.off);
   $("certs").innerHTML=certs.length?certs.map(c=>`<button class="cert" data-cert="${c.r}|${c.m.id}">${medalSVG(c.r,c.m)}<span class="ct">${medalTitle(c.r,c.m)}<span>${c.m.name} · ${rowLabel(c.r)} · ${fmtShort(c.d)}</span></span><span class="go">›</span></button>`).join(""):`<div class="empty" style="border:none">Die erste Urkunde gibt es, sobald ${p.name} eine ganze Reihe ohne Fehler schafft.</div>`;
   const list=PLAYERS.map(pp=>({pp,g:gamify(pp.id,attempts)})).sort((a,b)=>b.g.xp-a.g.xp);
@@ -747,7 +814,7 @@ async function makeCert(pid,row,mid,date){
   g.fillStyle=soft;g.font=`400 36px ${B}`;g.fillText("ist ab heute offiziell",W/2,1068);
   let fs=78;const t=medalTitle(row,m);g.font=`800 ${fs}px ${D}`;while(g.measureText(t).width>W-200&&fs>40){fs-=2;g.font=`800 ${fs}px ${D}`}
   g.fillStyle=ink;g.fillText(t,W/2,1160);
-  g.fillStyle=m.c2;g.font=`700 34px ${B}`;{let t2=`${m.name}-Medaille · ${rowLabel(row)} fehlerfrei mit ${medalBpm(row,m)} BPM`,fs2=34;g.font=`700 ${fs2}px ${B}`;while(g.measureText(t2).width>W-180&&fs2>22){fs2--;g.font=`700 ${fs2}px ${B}`}g.fillText(t2,W/2,1222);}
+  g.fillStyle=m.c2;g.font=`700 34px ${B}`;{let t2=isQuiz(row)?`${m.name}-Medaille · ${rowLabel(row)} · 10 von 10 mit ${QUIZ[row].secs[MEDALS.indexOf(m)]} Sekunden`:`${m.name}-Medaille · ${rowLabel(row)} fehlerfrei mit ${medalBpm(row,m)} BPM`,fs2=34;g.font=`700 ${fs2}px ${B}`;while(g.measureText(t2).width>W-180&&fs2>22){fs2--;g.font=`700 ${fs2}px ${B}`}g.fillText(t2,W/2,1222);}
   g.fillStyle=soft;g.font=`400 30px ${B}`;
   g.fillText(new Date(date+"T12:00:00").toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"}),W/2-230,1330);
   g.fillText("Spielleitung",W/2+230,1330);
@@ -803,8 +870,15 @@ function renderPlayers(){
   $("players").innerHTML=PLAYERS.map(p=>`<button class="player" style="--c:${pcol(p.id)}" data-p="${p.id}" aria-pressed="${sel.player===p.id}"><span class="avatar">${p.ini}</span><span class="nm">${p.name}</span></button>`).join("");
 }
 function renderRows(){
-  $("levels").innerHTML=LEVELS.map(l=>`<button data-lv="${l.id}" aria-pressed="${sel.level===l.id}">${l.name}</button>`).join("");
-  $("rows").classList.toggle("few",sel.level==="quadrat");
+  $("levels").innerHTML=PLAY_LEVELS.map(l=>`<button data-lv="${l.id}" class="${l.quiz?"quiz":""}${l.wide?" wide":""}" aria-pressed="${sel.level===l.id}">${l.name}</button>`).join("");
+  const ql=PLAY_LEVELS.find(l=>l.id===sel.level);
+  $("rows").classList.toggle("few",sel.level==="quadrat");$("rows").classList.toggle("four",!!(ql&&ql.quiz));
+  if(ql&&ql.quiz){
+    const r=ql.quiz,L=sel.player?attempts.filter(a=>a.player===sel.player&&a.row===r):[];
+    $("rows").innerHTML=QUIZ[r].secs.map((x,i)=>{const done=L.some(a=>a.complete&&a.bpm<=x);
+      return `<button class="row${done?" done":""}" data-d="${i}" aria-pressed="${sel.diff===i}"><span class="n" style="font-size:16px">${DIFF[i]}</span><span class="b">${done?"✓ ":""}${x} s</span></button>`}).join("");
+    return;
+  }
   $("rows").innerHTML=LEVELS.find(l=>l.id===sel.level).rows.map(r=>{
     let b="",done=false;
     if(sel.player){const s=statsFor(sel.player,r);if(s.list.length)b=s.level;done=s.unlocked!=null;}
@@ -814,6 +888,18 @@ function renderRows(){
 function renderTempo(){
   $("bpmVal").textContent=sel.bpm;
   const g=$("goal"),sb=$("startBtn");
+  $("tempoSec").hidden=!!(sel.row&&isQuiz(sel.row));
+  if(sel.player&&sel.row&&isQuiz(sel.row)){
+    const r=sel.row,sec=QUIZ[r].secs[sel.diff||0],p=player(sel.player);
+    const at=attempts.filter(a=>a.player===sel.player&&a.row===r&&a.bpm===sec);
+    const rec=at.length?Math.max(...at.map(a=>a.steps)):null;
+    g.hidden=false;
+    g.innerHTML=rec==null?`<strong>Ziel: möglichst viele richtig</strong><span>${QUIZ_TASKS} Aufgaben werden vorgelesen. Nach ${sec} Sekunden kommt der Buzzer, bis dahin muss die Antwort gesagt sein.</span>`
+      :rec>=QUIZ_TASKS?`<strong>Schon geschafft: 10 von 10</strong><span>${DIFF[sel.diff||0]} ist gemeistert. Probier die nächste Stufe.</span>`
+      :`<strong>Ziel: mehr als ${rec} richtig</strong><span>Rekord auf ${DIFF[sel.diff||0]}: ${rec} von ${QUIZ_TASKS}. Mit 10 von 10 gibt es eine Medaille.</span>`;
+    sb.disabled=false;$("startSub").textContent=`${p.name} · ${rowLabel(r)} · ${DIFF[sel.diff||0]} (${sec} s pro Aufgabe)`;
+    return;
+  }
   if(!sel.player||!sel.row){g.hidden=true;sb.disabled=true;$("startSub").textContent="Erst Spieler und Reihe wählen";return;}
   g.hidden=false;
   const p=player(sel.player),r=sel.row,max=stepsFor(r,config.goal),last=val(r,max);
@@ -868,7 +954,7 @@ function renderLog(){
   const byDay=new Map();sorted.forEach(a=>{if(!byDay.has(a.date))byDay.set(a.date,[]);byDay.get(a.date).push(a)});
   el.innerHTML=[...byDay.entries()].sort((a,b)=>a[0]<b[0]?1:-1).map(([d,list])=>`<div class="day"><h3>${fmtDay(d)}</h3><div class="entries">${list.map(a=>{
     const p=player(a.player);
-    return `<div class="entry" style="--c:${pcol(a.player)}"><span class="av">${p.ini}</span><div class="txt">${p.name}<div class="sub">${rowShort(a.row)} · ${a.bpm} BPM · ${a.steps}/${a.maxSteps}</div></div><div class="res">${a.reached}${a.complete?"<small>geschafft</small>":""}</div>${readOnly?"":`<button class="del${pendingDel===a.id?" confirm":""}" data-del="${a.id}" aria-label="Versuch löschen">${pendingDel===a.id?"Löschen?":"×"}</button>`}</div>`;
+    return `<div class="entry" style="--c:${pcol(a.player)}"><span class="av">${p.ini}</span><div class="txt">${p.name}<div class="sub">${rowShort(a.row)} · ${tempoText(a.row,a.bpm)} · ${a.steps}/${a.maxSteps}</div></div><div class="res">${a.reached}${a.complete?"<small>geschafft</small>":""}</div>${readOnly?"":`<button class="del${pendingDel===a.id?" confirm":""}" data-del="${a.id}" aria-label="Versuch löschen">${pendingDel===a.id?"Löschen?":"×"}</button>`}</div>`;
   }).join("")}</div></div>`).join("");
 }
 function renderSettings(){
@@ -882,11 +968,12 @@ $("players").addEventListener("click",e=>{
   const b=e.target.closest("[data-p]");if(!b)return;
   sel.player=b.dataset.p;
   const mine=attempts.filter(a=>a.player===sel.player).sort((a,b)=>b.ts-a.ts);
-  if(mine[0]){sel.row=mine[0].row;sel.level=levelOf(sel.row).id;}else if(sel.row&&!levelOf(sel.row))sel.row=null;
-  if(sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
+  if(mine[0]){sel.row=mine[0].row;sel.level=levelIdOf(sel.row);if(isQuiz(sel.row))sel.diff=quizLevel(sel.player,sel.row);}else if(sel.row&&!levelOf(sel.row))sel.row=null;
+  if(sel.row&&isQuiz(sel.row))sel.diff=quizLevel(sel.player,sel.row);else if(sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
   render();
 });
 $("rows").addEventListener("click",e=>{
+  const d=e.target.closest("[data-d]");if(d){sel.diff=Number(d.dataset.d);render();return}
   const b=e.target.closest("[data-r]");if(!b)return;
   sel.row=Number(b.dataset.r);
   sel.bpm=sel.player?statsFor(sel.player,sel.row).level:startBpm(sel.row);
@@ -897,7 +984,9 @@ $("board").addEventListener("click",e=>{
   sel.player=b.dataset.p;sel.row=Number(b.dataset.r);sel.level=levelOf(sel.row).id;sel.bpm=statsFor(sel.player,sel.row).level;
   render();location.hash="#spielen";
 });
-$("levels").addEventListener("click",e=>{const b=e.target.closest("[data-lv]");if(!b||sel.level===b.dataset.lv)return;sel.level=b.dataset.lv;sel.row=null;render()});
+$("levels").addEventListener("click",e=>{const b=e.target.closest("[data-lv]");if(!b||sel.level===b.dataset.lv)return;sel.level=b.dataset.lv;
+  const ql=PLAY_LEVELS.find(l=>l.id===sel.level);
+  if(ql.quiz){sel.row=ql.quiz;sel.diff=sel.player?quizLevel(sel.player,ql.quiz):0}else sel.row=null;render()});
 $("boardLevels").addEventListener("click",e=>{const b=e.target.closest("[data-blv]");if(!b)return;boardLevel=b.dataset.blv;renderBoard()});
 $("bpmDown").onclick=()=>{sel.bpm=Math.max(MIN_BPM,sel.bpm-5);renderTempo()};
 $("bpmUp").onclick=()=>{sel.bpm=Math.min(MAX_BPM,sel.bpm+5);renderTempo()};
@@ -1180,6 +1269,7 @@ function showBeat(idx){
 }
 $("startBtn").onclick=async()=>{
   if(!sel.player||!sel.row)return;
+  if(isQuiz(sel.row)){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}
   if(readOnly){toast("Nur Ansicht: Speichern geht nur mit Bearbeitungsrecht.");return;}
   try{
     if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1187,6 +1277,7 @@ $("startBtn").onclick=async()=>{
     await ctx.resume();
   }catch(e){}
   if(!ctx){toast("Ton konnte nicht gestartet werden. Lautstärke und Stummschalter prüfen.");return;}
+  if(isQuiz(sel.row)){startQuiz();return}
   const p=player(sel.player);
   run={player:sel.player,row:sel.row,bpm:sel.bpm,steps:stepsFor(sel.row,config.goal),iv:60/sel.bpm,next:0,shown:-1,done:false,nodes:[]};
   run.total=4+run.steps;
@@ -1214,6 +1305,94 @@ $("stStop").onclick=()=>{
 $("stCancel").onclick=cancelRun;
 function cancelRun(){if(!run)return;run.done=true;silence();$("stage").hidden=true;run=null;toast("Abgebrochen, nichts gespeichert.");}
 
+/* ---------- Rechenspiel ---------- */
+let quiz=null,quizRaf=0;
+function makeTasks(row){
+  const out=[];let guard=0;
+  while(out.length<QUIZ_TASKS&&guard++<500){
+    let a=row===201?2+Math.floor(Math.random()*9):11+Math.floor(Math.random()*10),b=2+Math.floor(Math.random()*9);
+    if(row===201&&Math.random()<.5)[a,b]=[b,a];
+    const k=Math.min(a,b)+"x"+Math.max(a,b);if(out.some(t=>t.k===k))continue;
+    out.push({a,b,k});
+  }
+  return out;
+}
+function speak(text,done){
+  let fired=false;const fin=()=>{if(fired)return;fired=true;done&&done()};
+  try{
+    const u=new SpeechSynthesisUtterance(text);u.lang="de-DE";u.rate=.95;
+    const v=(speechSynthesis.getVoices()||[]).find(x=>x.lang&&x.lang.toLowerCase().startsWith("de"));if(v)u.voice=v;
+    u.onend=fin;u.onerror=fin;speechSynthesis.cancel();speechSynthesis.speak(u);setTimeout(fin,2600);
+  }catch(e){setTimeout(fin,500)}
+}
+function tone(freq,dur,type,vol,at){
+  if(!ctx)return;const t=at||ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.02);
+  g.gain.setValueAtTime(vol,t+Math.max(0.03,dur-0.12));g.gain.exponentialRampToValueAtTime(0.0001,t+Math.max(0.06,dur));
+  o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+dur+0.02);
+}
+function buzzer(){tone(150,1.1,"sawtooth",0.45);tone(157,1.1,"square",0.2)}
+function quizDots(){$("qDots").innerHTML=quiz.tasks.map((t,i)=>`<i class="${i<quiz.results.length?(quiz.results[i]?"ok":"no"):i===quiz.i?"cur":""}"></i>`).join("")}
+function startQuiz(){
+  const p=player(sel.player),row=sel.row,secs=QUIZ[row].secs[sel.diff||0];
+  quiz={player:sel.player,row,secs,i:0,results:[],tasks:makeTasks(row)};
+  $("qWho").innerHTML=`${p.name}<span>${rowLabel(row)} · ${DIFF[sel.diff||0]} (${secs} s)</span>`;
+  $("quiz").hidden=false;
+  try{if(navigator.wakeLock)navigator.wakeLock.request("screen").then(w=>wakeLock=w).catch(()=>{})}catch(e){}
+  askTask();
+}
+function askTask(){
+  if(!quiz)return;
+  if(quiz.i>=quiz.tasks.length){finishQuiz();return}
+  const t=quiz.tasks[quiz.i];quiz.phase="ask";
+  $("qCount").textContent=`Aufgabe ${quiz.i+1} von ${quiz.tasks.length}`;
+  $("qTask").textContent=`${t.a} × ${t.b}`;$("qAns").hidden=true;$("qJudge").hidden=true;$("qReveal").hidden=false;
+  $("qHint").textContent="Zuhören …";const bar=$("qTimer");bar.style.width="100%";bar.classList.remove("late");
+  quizDots();
+  const id=quiz.i;
+  speak(`${t.a} mal ${t.b}`,()=>{if(quiz&&quiz.i===id&&quiz.phase==="ask")startCountdown()});
+}
+function startCountdown(){
+  quiz.phase="think";quiz.t0=performance.now();quiz.lastSec=null;$("qHint").textContent="Jetzt antworten!";
+  const total=quiz.secs*1000,bar=$("qTimer");
+  const step=now=>{
+    if(!quiz||quiz.phase!=="think")return;
+    const left=Math.max(0,total-(now-quiz.t0));bar.style.width=(left/total*100)+"%";
+    const sec=Math.ceil(left/1000);
+    if(sec<=3&&sec>0&&sec!==quiz.lastSec){quiz.lastSec=sec;bar.classList.add("late");try{tone(880,0.08,"sine",0.25)}catch(e){}}
+    if(left<=0){try{buzzer()}catch(e){}revealQuiz();return}
+    quizRaf=requestAnimationFrame(step);
+  };
+  quizRaf=requestAnimationFrame(step);
+}
+function revealQuiz(){
+  if(!quiz||quiz.phase==="judge")return;
+  cancelAnimationFrame(quizRaf);try{speechSynthesis.cancel()}catch(e){}
+  quiz.phase="judge";const t=quiz.tasks[quiz.i];
+  $("qAns").textContent=t.a*t.b;$("qAns").hidden=false;$("qReveal").hidden=true;$("qJudge").hidden=false;
+  $("qHint").textContent=`${t.a} × ${t.b} = ${t.a*t.b}`;
+}
+function judgeQuiz(ok){
+  if(!quiz||quiz.phase!=="judge")return;
+  quiz.results.push(ok);quiz.i++;quiz.phase="next";quizDots();
+  setTimeout(askTask,350);
+}
+$("qReveal").onclick=revealQuiz;
+$("qRight").onclick=()=>judgeQuiz(true);
+$("qWrong").onclick=()=>judgeQuiz(false);
+$("qCancel").onclick=()=>{if(!quiz)return;cancelAnimationFrame(quizRaf);try{speechSynthesis.cancel()}catch(e){}quiz=null;$("quiz").hidden=true;
+  try{if(wakeLock){wakeLock.release();wakeLock=null}}catch(e){}toast("Abgebrochen, nichts gespeichert.")};
+async function finishQuiz(){
+  const q=quiz;quiz=null;$("quiz").hidden=true;
+  try{if(wakeLock){wakeLock.release();wakeLock=null}}catch(e){}
+  const steps=q.results.filter(Boolean).length;
+  const before=statsFor(q.player,q.row,q.secs);
+  res={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),player:q.player,row:q.row,bpm:q.secs,steps,maxSteps:q.tasks.length,date:todayStr(),ts:Date.now(),before,saved:steps};
+  showResult();
+  const ok=await store.put(res);
+  if(!ok&&res){res.failed=true;showResult();}
+}
+
 let res=null;
 async function finish(steps){
   if(!run||run.done)return;
@@ -1230,7 +1409,13 @@ function resAttempt(){return norm(res.id,{player:res.player,row:res.row,bpm:res.
 function showResult(){
   const r=res,b=r.before,p=player(r.player),max=r.maxSteps,reached=val(r.row,r.steps);
   let title,msg,win=false;
-  if(r.steps>=max){
+  if(isQuiz(r.row)){
+    const di=diffIndex(r.row,r.bpm),d=DIFF[di];
+    if(r.steps>=max){win=true;title=`${max} von ${max}!`;msg=di<3?`Alles richtig auf ${d}. Nächste Stufe: <b>${DIFF[di+1]} (${QUIZ[r.row].secs[di+1]} s)</b>.`:"Alles richtig auf Profi. Mehr geht nicht!"}
+    else if(b.record==null){title=`${r.steps} von ${max} richtig`;msg=`Erste Runde auf ${d}. Das ist jetzt der Rekord.`}
+    else if(r.steps>b.record){win=true;title="Neuer Rekord!";msg=`<b>${r.steps} von ${max}</b> richtig, vorher ${b.record}.`}
+    else{title=`${r.steps} von ${max} richtig`;msg=`Rekord auf ${d} bleibt <b>${b.record} von ${max}</b>. Morgen wieder!`}
+  }else if(r.steps>=max){
     win=true;title="Reihe geschafft!";
     msg=(b.unlocked==null||r.bpm>b.unlocked)?`${p.name} hat ${r.row>100?"die "+rowLabel(r.row):"die "+rowLabel(r.row)} bei ${r.bpm} BPM ohne Fehler geschafft. Neues Level: <b>${r.bpm+STEP_BPM} BPM</b>.`:`${r.bpm} BPM war bei ${rowLabel(r.row)} schon freigeschaltet. Gute Aufwärmrunde.`;
   }else if(b.record==null){
@@ -1249,7 +1434,7 @@ function showResult(){
   const without=attempts.filter(a=>a.id!==r.id);
   const gb=gamify(r.player,without),ga=gamify(r.player,without.concat([resAttempt()]));
   const items=[];
-  ROWS.forEach(row=>{const nw=MEDALS.filter(m=>ga.medals[row]&&ga.medals[row][m.id]&&!(gb.medals[row]&&gb.medals[row][m.id]));if(nw.length)items.push({type:"medal",row,m:nw[nw.length-1]})});
+  ALL_ROWS.forEach(row=>{const nw=MEDALS.filter(m=>ga.medals[row]&&ga.medals[row][m.id]&&!(gb.medals[row]&&gb.medals[row][m.id]));if(nw.length)items.push({type:"medal",row,m:nw[nw.length-1]})});
   ACH.forEach(a=>{if(ga.ach[a.id]&&!gb.ach[a.id])items.push({type:"ach",a})});
   if(ga.i>gb.i)items.push({type:"rank",rank:ga.rank});
   const gain=ga.xp-gb.xp;
@@ -1262,7 +1447,7 @@ function showResult(){
   $("resCert").onclick=med?()=>openCert(r.player,med.row,med.m.id):null;
   $("resGain").hidden=false;
   if((win||items.length)&&!r.celebrated){r.celebrated=true;setTimeout(()=>confetti(med?med.m.c1:null),150)}
-  $("adjVal").textContent=reached;$("adjSub").textContent=`${r.steps} von ${max} · Stopp zu spät? Hier korrigieren`;
+  $("adjVal").textContent=reached;$("adjSub").textContent=isQuiz(r.row)?`richtige Antworten von ${max} · bei Bedarf korrigieren`:`${r.steps} von ${max} · Stopp zu spät? Hier korrigieren`;
   $("result").hidden=false;$("resDone").focus();
 }
 $("adjDown").onclick=()=>{if(!res)return;res.steps=Math.max(0,res.steps-1);showResult()};
@@ -1271,7 +1456,7 @@ $("resDone").onclick=async()=>{
   if(!res)return;const r=res;
   if(r.steps!==r.saved||r.failed){const ok=await store.put(r);if(!ok){r.failed=true;showResult();return;}}
   res=null;$("result").hidden=true;
-  if(sel.player&&sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
+  if(sel.player&&sel.row&&isQuiz(sel.row))sel.diff=quizLevel(sel.player,sel.row);else if(sel.player&&sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
   render();
 };
 $("resDiscard").onclick=async()=>{if(!res)return;const id=res.id;res=null;$("result").hidden=true;await store.del(id);toast("Versuch gelöscht.");};
