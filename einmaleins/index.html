@@ -575,7 +575,8 @@ function renderGlobal(){
   const el=$("globalList");
   if(!globalData.list){el.innerHTML=`<div class="empty" style="border:none">${globalData.loading?"Rangliste wird geladen …":"Keine Verbindung zur Rangliste."}</div>`;return}
   const ws=weekStart();
-  const rows=globalData.list.map(p=>{const raw=globalData.mode==="week"?(p.weekStart===ws?p.week:0):p.skill;const f=hcpFor(p.age);return {...p,raw,f,score:Math.round(raw*f)}})
+  const dayOf=v=>/^\d{4}-\d{2}-\d{2}$/.test(v)?v:(isNaN(Date.parse(v))?"":todayStr(new Date(v)));
+  const rows=globalData.list.map(p=>{const raw=globalData.mode==="week"?(dayOf(p.weekStart)===ws?p.week:0):p.skill;const f=hcpFor(p.age);return {...p,raw,f,score:Math.round(raw*f)}})
     .filter(p=>p.raw>0).sort((a,b)=>b.score-a.score).slice(0,50);
   if(!rows.length){el.innerHTML=`<div class="empty" style="border:none">${globalData.mode==="week"?"Diese Woche hat noch niemand gespielt.":"Noch keine Wertung."}</div>`;return}
   el.innerHTML=rows.map((p,i)=>{const me=p.own?PLAYERS.find(x=>x.id===p.id):null;
