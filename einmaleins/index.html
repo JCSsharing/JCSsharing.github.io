@@ -32,7 +32,7 @@
   /* One dark world (made for the car in the morning). Layout: top segmented switch, page "Spielen" = 3 steps + start, page "Statistik" = cards, board, log. */
   --bg:#101119; --surface:#191b26; --surface-2:#222533; --line:#2c3042;
   --ink:#f4f2ec; --muted:#9496a8; --faint:#5d6074;
-  --p-jens:#7b93ff; --p-heloisa:#ff7eb3; --p-amelie:#48dcc2; --p-nala:#ffb84d;
+  --p-jens:#7b93ff; --p-heloisa:#ff7eb3; --p-amelie:#48dcc2; --p-nala:#ffb84d; --p-5:#b99cff; --p-6:#8fd86e;
   --stop:#ff5b5f; --accent:var(--ink);
   --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
@@ -64,7 +64,7 @@ header{padding-top:calc(18px + env(safe-area-inset-top));display:flex;justify-co
 .label b{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;background:var(--surface-2);color:var(--muted);font-size:11.5px;letter-spacing:0}
 
 /* Step 1: players */
-.players{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.players{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px}
 .player{--c:var(--muted);background:none;border:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
 .avatar{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:24px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--surface));border:2px solid color-mix(in srgb,var(--c) 30%,transparent);transition:transform .15s,background .2s}
 .player .nm{font-size:14.5px;color:var(--muted);font-weight:700}
@@ -75,6 +75,10 @@ header{padding-top:calc(18px + env(safe-area-inset-top));display:flex;justify-co
 .rows{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .row{background:var(--surface);border:1px solid var(--line);border-radius:14px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}
 .row .n{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1}
+.rows.few{grid-template-columns:1fr 1fr}
+.lvseg{margin:0 0 10px}
+.lvseg button{font-size:13.5px;height:40px;padding:0 6px}
+.lvlhead{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
 .row .b{min-height:1.2em;font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums}
 .row.done .b{color:color-mix(in srgb,var(--pc) 80%,var(--ink))}
 .row[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -181,7 +185,7 @@ tr:last-child td{padding-bottom:12px}
 .rankline .t span{font-size:12.5px;color:var(--faint);margin-left:6px}
 .xpbar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
 .xpbar div{height:100%;background:var(--c,var(--pc));border-radius:99px;transition:width .6s}
-.pchips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pchips{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px}
 .pchip{--c:var(--muted);border:1px solid var(--line);background:var(--surface);border-radius:99px;height:44px;font-weight:700;color:var(--muted);font-size:14px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pchip[aria-pressed="true"]{background:var(--c);color:var(--bg);border-color:var(--c)}
 .hero{--c:var(--muted);background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--surface)),var(--surface) 70%);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px}
@@ -238,9 +242,9 @@ tr:last-child td{padding-bottom:12px}
 .certov a.btn-main{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:99px;height:56px;flex:1;font-weight:700}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
 @media (prefers-reduced-motion: reduce){.nb,.certov img{animation:none}}
-.gate{position:fixed;inset:0;z-index:60;background:radial-gradient(120% 60% at 50% 0%,#1d2140,var(--bg) 70%);display:flex;align-items:center;justify-content:center;padding:20px}
+.gate{position:fixed;inset:0;z-index:60;background:radial-gradient(120% 60% at 50% 0%,#1d2140,var(--bg) 70%);display:flex;align-items:flex-start;justify-content:center;padding:calc(40px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom));overflow-y:auto}
 .gate[hidden]{display:none}
-.gate-card{width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.gate-card{width:100%;max-width:400px;margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
 .gate-card.shake{animation:shake .4s}
 @keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
 .gate-logo{display:flex;gap:8px}
@@ -248,12 +252,19 @@ tr:last-child td{padding-bottom:12px}
 .gate h1{font-size:26px;font-weight:800}
 .gate p{margin:0;color:var(--muted);font-size:15px;min-height:1.4em}
 .gate p.err{color:var(--stop)}
-.gate-dots{display:flex;gap:16px;margin:6px 0 10px}
-.gate-dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--faint)}
-.gate-dots i.on{background:var(--ink);border-color:var(--ink)}
-.gate-pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px}
-.gate-pad button{height:76px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-family:var(--display);font-size:30px;font-weight:700}
-.gate-pad button:active{background:var(--surface-2)}
+.gform{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left}
+.gform[hidden]{display:none}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+.field input,.pinputs input{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:400 17px var(--body);padding:0 14px;width:100%}
+.field input:focus,.pinputs input:focus{outline:2px solid var(--ink);outline-offset:1px}
+.pinputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.linkbtn{background:none;border:none;color:var(--ink);font-weight:700;font-size:14px;text-align:left;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.linkbtn[hidden]{display:none}
+.gbtn{height:54px;border-radius:99px;font-size:17px;font-weight:700;margin-top:4px}
+.gate .seg{width:100%;margin-top:0}
+.famcard{display:flex;flex-direction:column;gap:12px;padding:14px 16px}
+.famcard .row2{display:flex;gap:10px;flex-wrap:wrap}
+.famcard .row2 button{flex:1;min-height:48px;border-radius:99px;font-weight:700;font-size:15px}
 @media (prefers-reduced-motion: reduce){.gate-card.shake{animation:none}}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14.5px;font-weight:700;z-index:40;max-width:90vw;text-align:center}
 .toast[hidden]{display:none}
@@ -280,6 +291,7 @@ tr:last-child td{padding-bottom:12px}
     </section>
     <section>
       <div class="label"><b>2</b>Welche Reihe?</div>
+      <div class="seg lvseg" id="levels" role="group" aria-label="Spielebene"></div>
       <div class="rows" id="rows"></div>
     </section>
     <section>
@@ -302,7 +314,7 @@ tr:last-child td{padding-bottom:12px}
     <section>
       <div class="label">Medaillen pro Reihe</div>
       <div class="medals" id="medals"></div>
-      <div class="legend">Bronze ab 60 BPM · Silber ab 80 · Gold ab 100 · Diamant ab 120. Jeweils die ganze Reihe ohne Fehler.</div>
+      <div class="legend">Kleines 1×1: Bronze ab 60 BPM · Silber 80 · Gold 100 · Diamant 120. Großes 1×1 und Quadratzahlen: Bronze ab 40 · Silber 60 · Gold 80 · Diamant 100. Jeweils die ganze Reihe ohne Fehler.</div>
     </section>
     <section>
       <div class="label">Abzeichen</div>
@@ -327,6 +339,7 @@ tr:last-child td{padding-bottom:12px}
     </section>
     <section>
       <div class="label">Level pro Reihe (BPM)</div>
+      <div class="seg lvseg" id="boardLevels" role="group" aria-label="Spielebene der Tafel"></div>
       <div class="box board-wrap"><table id="board"></table></div>
       <div class="legend">Zahl = aktuelles Level in BPM. Je kräftiger die Farbe, desto schneller. Feld antippen, um genau das zu spielen.</div>
     </section>
@@ -334,11 +347,26 @@ tr:last-child td{padding-bottom:12px}
       <div class="label">Verlauf</div>
       <div class="log" id="log"><div class="empty">Ergebnisse werden geladen …</div></div>
     </section>
+    <section id="famSection" hidden>
+      <div class="label" id="famLabel">Familie</div>
+      <div class="box famcard">
+        <div class="field">Spieler (Vornamen)
+          <div class="pinputs" id="fPlayers"></div>
+          <button type="button" class="linkbtn" id="fAdd">+ weiteren Spieler</button>
+        </div>
+        <div class="row2">
+          <button class="btn-main" id="fSave">Spieler speichern</button>
+          <button class="btn-ghost" id="fInvite">Andere Familie einladen</button>
+        </div>
+        <button class="linkbtn" id="fLogout">Abmelden</button>
+      </div>
+    </section>
     <section>
       <div class="label">Spielregeln</div>
       <div class="box rules">
         <ol>
-          <li>Jede Reihe startet bei <b>60 BPM</b>. Nach 4 Vorzähl-Ticks kommt auf jeden Schlag die nächste Zahl.</li>
+          <li>Drei Spielebenen: <b>kleines 1×1</b> (1er bis 10er), <b>großes 1×1</b> (11er bis 20er) und <b>Quadratzahlen</b> (1², 4², 9² …). Das kleine 1×1 startet bei <b>60 BPM</b>, großes 1×1 und Quadratzahlen bei <b>40 BPM</b>.</li>
+          <li>Jede Reihe startet auf dem Start-Tempo ihrer Ebene. Nach 4 Vorzähl-Ticks kommt auf jeden Schlag die nächste Zahl.</li>
           <li>Wer die Reihe <b id="ruleGoal">bis ×10</b> ohne Fehler schafft, schaltet das nächste Level frei: <b>10 BPM schneller</b>.</li>
           <li>Beim ersten Fehler drückt der Spielleiter <b>Stopp</b>. Gespeichert wird die letzte richtige Zahl.</li>
           <li><b>Tagesziel:</b> mindestens eine Zahl weiter als der eigene Rekord auf dem aktuellen Level.</li>
@@ -401,32 +429,61 @@ tr:last-child td{padding-bottom:12px}
   <div class="gate-card" id="gateCard">
     <div class="gate-logo"><i style="background:var(--p-jens)"></i><i style="background:var(--p-heloisa)"></i><i style="background:var(--p-amelie)"></i><i style="background:var(--p-nala)"></i></div>
     <h1 id="gateTitle">Einmaleins-Metronom</h1>
-    <p id="gateMsg">Bitte den Familien-Code eingeben.</p>
-    <div class="gate-dots" id="gateDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    <div class="gate-pad" id="gatePad">
-      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
-      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
-      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
-      <span></span><button data-k="0">0</button><button data-k="del" aria-label="Löschen">⌫</button>
+    <p id="gateMsg">Melde deine Familie an oder lege eine neue an.</p>
+    <div class="seg" role="group" aria-label="Anmelden oder neue Familie">
+      <button id="gTabLogin" aria-pressed="true">Anmelden</button>
+      <button id="gTabReg" aria-pressed="false">Neue Familie</button>
     </div>
+    <form id="loginForm" class="gform" novalidate>
+      <label class="field">Familienname<input id="lFam" autocomplete="username" autocapitalize="words" required></label>
+      <label class="field">Passwort<input id="lPw" type="password" autocomplete="current-password" required></label>
+      <button class="btn-main gbtn" type="submit">Anmelden</button>
+    </form>
+    <form id="regForm" class="gform" novalidate hidden>
+      <label class="field">Familienname<input id="rFam" autocomplete="username" autocapitalize="words" placeholder="z. B. Schmidt aus Fürth" required></label>
+      <label class="field">Passwort (mindestens 6 Zeichen)<input id="rPw" type="password" autocomplete="new-password" required></label>
+      <label class="field">Passwort wiederholen<input id="rPw2" type="password" autocomplete="new-password" required></label>
+      <div class="field">Spieler (nur Vornamen oder Spitznamen)
+        <div class="pinputs" id="rPlayers"></div>
+        <button type="button" class="linkbtn" id="rAdd">+ weiteren Spieler</button>
+      </div>
+      <button class="btn-main gbtn" type="submit">Familie anlegen</button>
+    </form>
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
-const PLAYERS=[
-  {id:"jens",name:"Jens",ini:"J",color:"--p-jens"},
-  {id:"heloisa",name:"Heloísa",ini:"H",color:"--p-heloisa"},
-  {id:"amelie",name:"Amelie",ini:"A",color:"--p-amelie"},
-  {id:"nala",name:"Nala Lina",ini:"N",color:"--p-nala"}
+// Players come from the family account; the first four colours match the original family
+const COLORS=[["--p-jens","#3653d6"],["--p-heloisa","#c23a80"],["--p-amelie","#0f8b78"],["--p-nala","#c2700c"],["--p-5","#7650d0"],["--p-6","#3d8a28"]];
+const DEFAULT_PLAYERS=[{id:"jens",name:"Jens"},{id:"heloisa",name:"Heloísa"},{id:"amelie",name:"Amelie"},{id:"nala",name:"Nala Lina"}];
+const MAX_PLAYERS=6;
+let PLAYERS=[],PID=[];
+function cleanName(s){return String(s||"").replace(/[<>&"'`\\]/g,"").replace(/\s+/g," ").trim().slice(0,20)}
+function setPlayers(list){
+  PLAYERS=(list||[]).slice(0,8).map((p,i)=>{const n=cleanName(p.name)||"?";return {id:String(p.id),name:n,ini:n[0].toUpperCase(),color:COLORS[i%COLORS.length][0],hex:COLORS[i%COLORS.length][1]}});
+  PID=PLAYERS.map(p=>p.id);
+  if(typeof sel!=="undefined"&&sel.player&&!PID.includes(sel.player))sel.player=null;
+}
+// Spielebenen: kleines 1×1 (1–10), großes 1×1 (11–20), Quadratzahlen (101 = 1²–10², 102 = 11²–20²)
+const LEVELS=[
+  {id:"klein",name:"Kleines 1×1",rows:[1,2,3,4,5,6,7,8,9,10],start:60},
+  {id:"gross",name:"Großes 1×1",rows:[11,12,13,14,15,16,17,18,19,20],start:40},
+  {id:"quadrat",name:"Quadratzahlen",rows:[101,102],start:40}
 ];
-const PID=PLAYERS.map(p=>p.id);
-const ROWS=[1,2,3,4,5,6,7,8,9,10];
+const ROWS=LEVELS.flatMap(l=>l.rows);
+function levelOf(row){return LEVELS.find(l=>l.rows.includes(row))||LEVELS[0]}
+function startBpm(row){return levelOf(row).start}
+function val(row,k){return row===101?k*k:row===102?(k+10)*(k+10):k*row}
+function eqText(row,k){return row===101?`${k} × ${k}`:row===102?`${k+10} × ${k+10}`:`${k} × ${row}`}
+function rowShort(row){return row===101?"1²–10²":row===102?"11²–20²":row+"er"}
+function rowLabel(row){return row===101?"Quadratzahlen 1–10":row===102?"Quadratzahlen 11–20":row+"er-Reihe"}
 const START_BPM=60, STEP_BPM=10, MIN_BPM=30, MAX_BPM=240;
 const LS_KEY="einmaleins-metronom-v1";
 
 let attempts=[], config={goal:"x10"}, db=null, readOnly=false;
-let sel={player:null,row:null,bpm:START_BPM};
+let sel={player:null,row:null,bpm:START_BPM,level:"klein"};
+setPlayers(DEFAULT_PLAYERS);
 const $=id=>document.getElementById(id);
 
 function pad(n){return String(n).padStart(2,"0")}
@@ -434,7 +491,7 @@ function todayStr(d=new Date()){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"
 function fmtDay(s){const d=new Date(s+"T12:00:00");const t=todayStr();const y=todayStr(new Date(Date.now()-864e5));
   const base=d.toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"short"});
   return s===t?"Heute · "+base:s===y?"Gestern · "+base:base;}
-function stepsFor(row,goal){return goal==="x10"?10:Math.floor(100/row)}
+function stepsFor(row,goal){return row<=10&&goal!=="x10"?Math.floor(100/row):10}
 function player(id){return PLAYERS.find(p=>p.id===id)}
 function pcol(id){const p=player(id);return p?`var(${p.color})`:"var(--ink)"}
 function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,3200)}
@@ -448,7 +505,7 @@ function norm(id,o){
   const row=Number(o.row),bpm=Number(o.bpm),steps=Number(o.steps),maxSteps=Number(o.maxSteps),ts=Number(o.ts);
   if(!ROWS.includes(row)||!Number.isFinite(bpm)||!Number.isFinite(steps)||!Number.isFinite(maxSteps))return null;
   const date=typeof o.date==="string"&&/^\d{4}-\d\d-\d\d$/.test(o.date)?o.date:todayStr(new Date(ts||Date.now()));
-  return {id,player:o.player,row,bpm,steps,maxSteps,reached:steps*row,complete:steps>=maxSteps,date,ts:Number.isFinite(ts)?ts:0};
+  return {id,player:o.player,row,bpm,steps,maxSteps,reached:val(row,steps),complete:steps>=maxSteps,date,ts:Number.isFinite(ts)?ts:0};
 }
 
 /* ---------- Logic ---------- */
@@ -456,7 +513,7 @@ function statsFor(pid,row,bpm){
   const list=attempts.filter(a=>a.player===pid&&a.row===row).sort((a,b)=>b.ts-a.ts);
   const comp=list.filter(a=>a.complete);
   const unlocked=comp.length?Math.max(...comp.map(a=>a.bpm)):null;
-  const level=unlocked!=null?unlocked+STEP_BPM:(list[0]?list[0].bpm:START_BPM);
+  const level=unlocked!=null?unlocked+STEP_BPM:(list[0]?list[0].bpm:startBpm(row));
   const b=bpm??level;
   const at=list.filter(a=>a.bpm===b);
   const record=at.length?Math.max(...at.map(a=>a.steps)):null;
@@ -472,20 +529,25 @@ function streak(pid){
 }
 
 /* ---------- Gamification ---------- */
-const CERT_HEX={jens:"#3653d6",heloisa:"#c23a80",amelie:"#0f8b78",nala:"#c2700c"};
 // Each row has its own creature; g = grammatical gender for the adjective ending
 const ROW_FUN={
   1:{name:"Einser-Eichhörnchen",emoji:"🐿️",g:"n"}, 2:{name:"Zweier-Zebra",emoji:"🦓",g:"n"},
   3:{name:"Dreier-Drache",emoji:"🐉",g:"m"}, 4:{name:"Vierer-Faultier",emoji:"🦥",g:"n"},
   5:{name:"Fünfer-Fuchs",emoji:"🦊",g:"m"}, 6:{name:"Sechser-Seehund",emoji:"🦭",g:"m"},
   7:{name:"Siebener-Schildkröte",emoji:"🐢",g:"f"}, 8:{name:"Achter-Adler",emoji:"🦅",g:"m"},
-  9:{name:"Neuner-Nashorn",emoji:"🦏",g:"n"}, 10:{name:"Zehner-Zauberer",emoji:"🧙",g:"m"}
+  9:{name:"Neuner-Nashorn",emoji:"🦏",g:"n"}, 10:{name:"Zehner-Zauberer",emoji:"🧙",g:"m"},
+  11:{name:"Elfer-Elefant",emoji:"🐘",g:"m"}, 12:{name:"Zwölfer-Zwergpinguin",emoji:"🐧",g:"m"},
+  13:{name:"Dreizehner-Dino",emoji:"🦕",g:"m"}, 14:{name:"Vierzehner-Fledermaus",emoji:"🦇",g:"f"},
+  15:{name:"Fünfzehner-Flamingo",emoji:"🦩",g:"m"}, 16:{name:"Sechzehner-Schnecke",emoji:"🐌",g:"f"},
+  17:{name:"Siebzehner-Skorpion",emoji:"🦂",g:"m"}, 18:{name:"Achtzehner-Alpaka",emoji:"🦙",g:"n"},
+  19:{name:"Neunzehner-Nilpferd",emoji:"🦛",g:"n"}, 20:{name:"Zwanziger-Einhorn",emoji:"🦄",g:"n"},
+  101:{name:"Quadrat-Qualle",emoji:"🪼",g:"f"}, 102:{name:"Quadrat-Krake",emoji:"🐙",g:"f"}
 };
 const MEDALS=[
-  {id:"bronze",name:"Bronze",bpm:60,adj:"Klein",c1:"#e7a874",c2:"#9a5a2b"},
-  {id:"silber",name:"Silber",bpm:80,adj:"Flink",c1:"#eef2f7",c2:"#8a95a6"},
-  {id:"gold",name:"Gold",bpm:100,adj:"Golden",c1:"#ffdc6a",c2:"#c2870c"},
-  {id:"diamant",name:"Diamant",bpm:120,adj:"Legendär",c1:"#c4f4ff",c2:"#2f9cc4"}
+  {id:"bronze",name:"Bronze",off:0,adj:"Klein",c1:"#e7a874",c2:"#9a5a2b"},
+  {id:"silber",name:"Silber",off:20,adj:"Flink",c1:"#eef2f7",c2:"#8a95a6"},
+  {id:"gold",name:"Gold",off:40,adj:"Golden",c1:"#ffdc6a",c2:"#c2870c"},
+  {id:"diamant",name:"Diamant",off:60,adj:"Legendär",c1:"#c4f4ff",c2:"#2f9cc4"}
 ];
 const RANKS=[
   {xp:0,name:"Rechen-Küken",emoji:"🐣"},{xp:60,name:"Zahlen-Flitzer",emoji:"🏃"},
@@ -504,9 +566,12 @@ const ACH=[
   {id:"comeback",icon:"💪",name:"Comeback",desc:"Nach 3 Fehlversuchen doch Rekord"},
   {id:"gold",icon:"🥇",name:"Goldrausch",desc:"Die erste Goldmedaille"},
   {id:"turbo",icon:"⚡",name:"Turbo",desc:"Eine Reihe mit 120 BPM"},
-  {id:"allten",icon:"🏆",name:"Alle Zehn",desc:"Jede Reihe mindestens Bronze"},
+  {id:"allten",icon:"🏆",name:"Alle Zehn",desc:"Jede Reihe im kleinen 1×1 mindestens Bronze"},
+  {id:"gross",icon:"🧠",name:"Großer Denker",desc:"Erste Medaille im großen 1×1"},
+  {id:"quadrat",icon:"🟪",name:"Quadrat-Profi",desc:"Erste Medaille bei den Quadratzahlen"},
   {id:"family",icon:"🤝",name:"Familien-Runde",desc:"Am selben Tag wie alle anderen gespielt"}
 ];
+function medalBpm(row,m){return startBpm(row)+m.off}
 function medalTitle(row,m){const f=ROW_FUN[row];const end=f.g==="m"?"er":f.g==="f"?"e":"es";return `${m.adj}${end} ${f.name}`}
 function dayGap(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5)}
 function rankFor(xp){let i=0;RANKS.forEach((r,k)=>{if(xp>=r.xp)i=k});return {i,rank:RANKS[i],next:RANKS[i+1]||null}}
@@ -534,10 +599,11 @@ function gamify(pid,all){
     if(a.complete){
       earn("firstrow",a.date);
       if(unlocked[a.row]==null||a.bpm>unlocked[a.row]){xp+=50;unlocked[a.row]=a.bpm}
-      MEDALS.forEach(m=>{if(a.bpm>=m.bpm){medals[a.row]=medals[a.row]||{};if(!medals[a.row][m.id])medals[a.row][m.id]=a.date}});
+      MEDALS.forEach(m=>{if(a.bpm>=medalBpm(a.row,m)){medals[a.row]=medals[a.row]||{};if(!medals[a.row][m.id])medals[a.row][m.id]=a.date}});
       if(a.bpm>=120)earn("turbo",a.date);
-      if(medals[a.row].gold)earn("gold",a.date);
-      if(ROWS.every(r=>medals[r]&&medals[r].bronze))earn("allten",a.date);
+      if(medals[a.row]&&medals[a.row].bronze){if(levelOf(a.row).id==="gross")earn("gross",a.date);if(levelOf(a.row).id==="quadrat")earn("quadrat",a.date);}
+      if(medals[a.row]&&medals[a.row].gold)earn("gold",a.date);
+      if(LEVELS[0].rows.every(r=>medals[r]&&medals[r].bronze))earn("allten",a.date);
     }
   }
   const top={};ROWS.forEach(r=>{const got=MEDALS.filter(m=>medals[r]&&medals[r][m.id]);top[r]=got.length?got[got.length-1]:null});
@@ -561,7 +627,8 @@ function renderRankline(){
 }
 $("rankline").onclick=()=>{trophyPlayer=sel.player;location.hash="#pokale"};
 function renderTrophy(){
-  const pid=trophyPlayer||sel.player||"amelie";
+  if(trophyPlayer&&!PID.includes(trophyPlayer))trophyPlayer=null;
+  const pid=trophyPlayer||sel.player||PID[0];if(!pid)return;
   $("pchips").innerHTML=PLAYERS.map(p=>`<button class="pchip" style="--c:${pcol(p.id)}" data-tp="${p.id}" aria-pressed="${p.id===pid}">${p.name.split(" ")[0]}</button>`).join("");
   const p=player(pid),g=gamify(pid,attempts),col=pcol(pid);
   const pct=g.next?Math.round((g.xp-g.rank.xp)/(g.next.xp-g.rank.xp)*100):100;
@@ -569,16 +636,16 @@ function renderTrophy(){
   $("hero").style.setProperty("--c",col);
   $("hero").innerHTML=`<div class="top"><span class="big">${g.rank.emoji}</span><div><div class="rk">${g.rank.name}</div><div class="xp">${p.name} · ${g.xp} Punkte · ${nMed} Medaillen · ${Object.keys(g.ach).length} Abzeichen</div></div></div>
     <div class="xpbar" style="--c:${col}"><div style="width:${pct}%"></div></div><div class="nx">${g.next?`Noch ${g.next.xp-g.xp} Punkte bis ${g.next.emoji} ${g.next.name}`:"Höchster Rang erreicht!"}</div>`;
-  $("medals").innerHTML=ROWS.map(r=>{
+  $("medals").innerHTML=LEVELS.map(l=>`<div class="lvlhead">${l.name}</div>`+l.rows.map(r=>{
     const m=g.top[r],nextM=MEDALS.find(x=>!(g.medals[r]&&g.medals[r][x.id]));
     const title=m?medalTitle(r,m):ROW_FUN[r].name;
-    const sub=m?`${m.name} · ${r}er-Reihe${nextM?` · ${nextM.name} ab ${nextM.bpm} BPM`:" · höchste Stufe"}`:`Bronze: ${r}er-Reihe bei 60 BPM schaffen`;
+    const sub=m?`${m.name} · ${rowLabel(r)}${nextM?` · ${nextM.name} ab ${medalBpm(r,nextM)} BPM`:" · höchste Stufe"}`:`Bronze: ${rowLabel(r)} bei ${startBpm(r)} BPM schaffen`;
     return `<button class="medal ${m?"has":"locked"}" style="--mc:${m?m.c1:"var(--faint)"}" ${m?`data-cert="${r}|${m.id}"`:"disabled"}>${medalSVG(r,m)}<span><span class="mt">${title}</span><span class="ms">${sub}</span></span></button>`;
-  }).join("");
+  }).join("")).join("");
   $("achs").innerHTML=ACH.map(a=>{const d=g.ach[a.id];return `<div class="ach ${d?"":"locked"}" style="--c:${col}"><span class="ai">${a.icon}</span><span class="an">${a.name}</span><span class="ad">${d?"✓ "+fmtShort(d):a.desc}</span></div>`}).join("");
   const certs=[];ROWS.forEach(r=>MEDALS.forEach(m=>{const d=g.medals[r]&&g.medals[r][m.id];if(d)certs.push({r,m,d})}));
-  certs.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:b.m.bpm-a.m.bpm);
-  $("certs").innerHTML=certs.length?certs.map(c=>`<button class="cert" data-cert="${c.r}|${c.m.id}">${medalSVG(c.r,c.m)}<span class="ct">${medalTitle(c.r,c.m)}<span>${c.m.name} · ${c.r}er-Reihe · ${fmtShort(c.d)}</span></span><span class="go">›</span></button>`).join(""):`<div class="empty" style="border:none">Die erste Urkunde gibt es, sobald ${p.name} eine ganze Reihe ohne Fehler schafft.</div>`;
+  certs.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:b.m.off-a.m.off);
+  $("certs").innerHTML=certs.length?certs.map(c=>`<button class="cert" data-cert="${c.r}|${c.m.id}">${medalSVG(c.r,c.m)}<span class="ct">${medalTitle(c.r,c.m)}<span>${c.m.name} · ${rowLabel(c.r)} · ${fmtShort(c.d)}</span></span><span class="go">›</span></button>`).join(""):`<div class="empty" style="border:none">Die erste Urkunde gibt es, sobald ${p.name} eine ganze Reihe ohne Fehler schafft.</div>`;
   const list=PLAYERS.map(pp=>({pp,g:gamify(pp.id,attempts)})).sort((a,b)=>b.g.xp-a.g.xp);
   $("ranking").innerHTML=list.map((x,i)=>`<div class="rk-row" style="--c:${pcol(x.pp.id)}"><span class="pos">${i+1}</span><span class="av">${x.pp.ini}</span><span class="nm">${x.pp.name}<span>${x.g.rank.emoji} ${x.g.rank.name}</span></span><span class="pts">${x.g.xp}</span></div>`).join("");
 }
@@ -587,7 +654,7 @@ $("pchips").addEventListener("click",e=>{const b=e.target.closest("[data-tp]");i
 document.addEventListener("click",e=>{
   const b=e.target.closest("[data-cert]");if(!b)return;
   const [r,mid]=b.dataset.cert.split("|");
-  const pid=b.closest("#viewTrophy")?(trophyPlayer||sel.player||"amelie"):(res&&res.player)||sel.player;
+  const pid=b.closest("#viewTrophy")?(trophyPlayer||sel.player||PID[0]):(res&&res.player)||sel.player;
   openCert(pid,Number(r),mid);
 });
 
@@ -618,11 +685,11 @@ async function makeCert(pid,row,mid,date){
   g.fillStyle="#ffffff";g.beginPath();g.arc(W/2,cy,142,0,Math.PI*2);g.fill();
   g.textBaseline="middle";g.font=`150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;g.fillText(f.emoji,W/2,cy+8);
   g.textBaseline="alphabetic";
-  g.fillStyle=CERT_HEX[pid]||ink;g.font=`800 100px ${D}`;g.fillText(p.name,W/2,1010);
+  g.fillStyle=(p&&p.hex)||ink;g.font=`800 100px ${D}`;g.fillText(p.name,W/2,1010);
   g.fillStyle=soft;g.font=`400 36px ${B}`;g.fillText("ist ab heute offiziell",W/2,1068);
   let fs=78;const t=medalTitle(row,m);g.font=`800 ${fs}px ${D}`;while(g.measureText(t).width>W-200&&fs>40){fs-=2;g.font=`800 ${fs}px ${D}`}
   g.fillStyle=ink;g.fillText(t,W/2,1160);
-  g.fillStyle=m.c2;g.font=`700 34px ${B}`;g.fillText(`${m.name}-Medaille · ${row}er-Reihe fehlerfrei mit ${m.bpm} BPM`,W/2,1222);
+  g.fillStyle=m.c2;g.font=`700 34px ${B}`;{let t2=`${m.name}-Medaille · ${rowLabel(row)} fehlerfrei mit ${medalBpm(row,m)} BPM`,fs2=34;g.font=`700 ${fs2}px ${B}`;while(g.measureText(t2).width>W-180&&fs2>22){fs2--;g.font=`700 ${fs2}px ${B}`}g.fillText(t2,W/2,1222);}
   g.fillStyle=soft;g.font=`400 30px ${B}`;
   g.fillText(new Date(date+"T12:00:00").toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"}),W/2-230,1330);
   g.fillText("Spielleitung",W/2+230,1330);
@@ -635,7 +702,7 @@ async function openCert(pid,row,mid){
   const date=(g.medals[row]&&g.medals[row][mid])||todayStr();
   const c=await makeCert(pid,row,mid,date);
   const url=c.toDataURL("image/png");$("certImg").src=url;
-  const fname=`Urkunde-${player(pid).name.replace(/\s/g,"")}-${row}er-${mid}.png`;
+  const fname=`Urkunde-${player(pid).name.replace(/\s/g,"")}-${row}-${mid}.png`;
   $("certSave").href=url;$("certSave").download=fname;
   certFile=null;$("certShare").hidden=true;
   c.toBlob(b=>{try{const f=new File([b],fname,{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]})){certFile=f;$("certShare").hidden=false}}catch(e){}});
@@ -649,7 +716,7 @@ function confetti(extra){
   if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   const cv=$("confetti"),g=cv.getContext("2d"),W=cv.width=innerWidth*devicePixelRatio,H=cv.height=innerHeight*devicePixelRatio;
   const cs=getComputedStyle(document.documentElement);
-  const cols=["--p-jens","--p-heloisa","--p-amelie","--p-nala"].map(v=>cs.getPropertyValue(v).trim()).concat(extra?[extra,extra]:[]);
+  const cols=COLORS.map(c=>cs.getPropertyValue(c[0]).trim()).concat(extra?[extra,extra]:[]);
   const P=Array.from({length:140},()=>({x:W/2+(Math.random()-.5)*W*.3,y:H*.55,vx:(Math.random()-.5)*W*.022,vy:-(Math.random()*H*.028+H*.012),r:(Math.random()*6+4)*devicePixelRatio,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[Math.floor(Math.random()*cols.length)]}));
   const t0=performance.now();
   (function step(t){
@@ -672,16 +739,18 @@ window.addEventListener("hashchange",()=>{route();window.scrollTo(0,0)});
 /* ---------- Render ---------- */
 function render(){
   setPlayerColor();
-  renderPlayers();renderRankline();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();renderTrophy();
+  renderPlayers();renderRankline();renderRows();renderTempo();renderCards();renderBoard();renderLog();renderSettings();renderTrophy();renderFamily();
 }
 function renderPlayers(){
   $("players").innerHTML=PLAYERS.map(p=>`<button class="player" style="--c:${pcol(p.id)}" data-p="${p.id}" aria-pressed="${sel.player===p.id}"><span class="avatar">${p.ini}</span><span class="nm">${p.name}</span></button>`).join("");
 }
 function renderRows(){
-  $("rows").innerHTML=ROWS.map(r=>{
+  $("levels").innerHTML=LEVELS.map(l=>`<button data-lv="${l.id}" aria-pressed="${sel.level===l.id}">${l.name}</button>`).join("");
+  $("rows").classList.toggle("few",sel.level==="quadrat");
+  $("rows").innerHTML=LEVELS.find(l=>l.id===sel.level).rows.map(r=>{
     let b="",done=false;
     if(sel.player){const s=statsFor(sel.player,r);if(s.list.length)b=s.level;done=s.unlocked!=null;}
-    return `<button class="row${done?" done":""}" data-r="${r}" aria-pressed="${sel.row===r}"><span class="n">${r}er</span><span class="b">${b}</span></button>`;
+    return `<button class="row${done?" done":""}" data-r="${r}" aria-pressed="${sel.row===r}"><span class="n">${rowShort(r)}</span><span class="b">${b}</span></button>`;
   }).join("");
 }
 function renderTempo(){
@@ -689,7 +758,7 @@ function renderTempo(){
   const g=$("goal"),sb=$("startBtn");
   if(!sel.player||!sel.row){g.hidden=true;sb.disabled=true;$("startSub").textContent="Erst Spieler und Reihe wählen";return;}
   g.hidden=false;
-  const p=player(sel.player),r=sel.row,max=stepsFor(r,config.goal),last=max*r;
+  const p=player(sel.player),r=sel.row,max=stepsFor(r,config.goal),last=val(r,max);
   const s=statsFor(sel.player,r,sel.bpm);
   let html;
   if(s.unlocked!=null&&sel.bpm<=s.unlocked){
@@ -697,14 +766,14 @@ function renderTempo(){
   }else if(s.record==null){
     html=`<strong>Ziel: so weit wie möglich</strong><span>Erster Versuch bei ${sel.bpm} BPM · Reihe bis ${last}</span>`;
   }else{
-    const nextNum=Math.min(s.record+1,max)*r;
-    html=`<strong>Ziel: bis ${nextNum}</strong><span>Rekord bis ${s.record*r} · noch ${max-s.record} Zahlen bis zum nächsten Level</span>`;
+    const nextNum=val(r,Math.min(s.record+1,max));
+    html=`<strong>Ziel: bis ${nextNum}</strong><span>Rekord bis ${val(r,s.record)} · noch ${max-s.record} Zahlen bis zum nächsten Level</span>`;
     if(s.since>=3&&sel.bpm-5>=MIN_BPM)html+=`<span class="hint">${s.since} Versuche ohne Rekord. Tipp: Zwischenstufe mit ${sel.bpm-5} BPM.</span>`;
   }
   if(sel.bpm!==s.level)html+=`<span>Aktuelles Level: ${s.level} BPM · <button class="lvl" id="toLevel">zurücksetzen</button></span>`;
   g.innerHTML=html;
   const tl=$("toLevel");if(tl)tl.onclick=()=>{sel.bpm=s.level;renderTempo();};
-  sb.disabled=false;$("startSub").textContent=`${p.name} · ${r}er-Reihe · ${sel.bpm} BPM`;
+  sb.disabled=false;$("startSub").textContent=`${p.name} · ${rowLabel(r)} · ${sel.bpm} BPM`;
 }
 function renderCards(){
   const t=todayStr();
@@ -712,7 +781,7 @@ function renderCards(){
     const mine=attempts.filter(a=>a.player===p.id);
     const today=mine.filter(a=>a.date===t).length;
     let levels=0,top=null;
-    ROWS.forEach(r=>{const s=statsFor(p.id,r);if(s.unlocked!=null){levels+=Math.max(1,(s.unlocked-START_BPM)/STEP_BPM+1);top=Math.max(top??0,s.unlocked);}});
+    ROWS.forEach(r=>{const s=statsFor(p.id,r);if(s.unlocked!=null){levels+=Math.max(1,(s.unlocked-startBpm(r))/STEP_BPM+1);top=Math.max(top??0,s.unlocked);}});
     return `<div class="pcard" style="--c:${pcol(p.id)}"><h3>${p.name}</h3><div class="kv">
       <div><strong>${streak(p.id)}</strong><span>Tage in Folge</span></div>
       <div><strong>${today}</strong><span>Versuche heute</span></div>
@@ -720,12 +789,15 @@ function renderCards(){
       <div><strong>${top??"–"}</strong><span>schnellstes BPM</span></div></div></div>`;
   }).join("");
 }
+let boardLevel="klein";
 function renderBoard(){
-  let h=`<tr><th></th>${ROWS.map(r=>`<th>${r}</th>`).join("")}</tr>`;
-  h+=PLAYERS.map(p=>`<tr><td class="who" style="--c:${pcol(p.id)}"><span title="${p.name}">${p.ini}</span></td>${ROWS.map(r=>{
+  $("boardLevels").innerHTML=LEVELS.map(l=>`<button data-blv="${l.id}" aria-pressed="${boardLevel===l.id}">${l.name}</button>`).join("");
+  const BR=LEVELS.find(l=>l.id===boardLevel).rows;
+  let h=`<tr><th></th>${BR.map(r=>`<th>${r>100?rowShort(r):r}</th>`).join("")}</tr>`;
+  h+=PLAYERS.map(p=>`<tr><td class="who" style="--c:${pcol(p.id)}"><span title="${p.name}">${p.ini}</span></td>${BR.map(r=>{
     const s=statsFor(p.id,r);const any=s.list.length>0;
-    const lv=Math.max(0,Math.min(90,22+(s.level-START_BPM)/STEP_BPM*16));
-    return `<td class="cell"><button style="--c:${pcol(p.id)};--lv:${any?lv:0}" class="${any?"":"none"}" data-p="${p.id}" data-r="${r}" aria-label="${p.name}, ${r}er-Reihe, ${s.level} BPM">${any?s.level:""}</button></td>`;
+    const lv=Math.max(0,Math.min(90,22+(s.level-startBpm(r))/STEP_BPM*16));
+    return `<td class="cell"><button style="--c:${pcol(p.id)};--lv:${any?lv:0}" class="${any?"":"none"}" data-p="${p.id}" data-r="${r}" aria-label="${p.name}, ${rowLabel(r)}, ${s.level} BPM">${any?s.level:""}</button></td>`;
   }).join("")}</tr>`).join("");
   $("board").innerHTML=h;
 }
@@ -738,7 +810,7 @@ function renderLog(){
   const byDay=new Map();sorted.forEach(a=>{if(!byDay.has(a.date))byDay.set(a.date,[]);byDay.get(a.date).push(a)});
   el.innerHTML=[...byDay.entries()].sort((a,b)=>a[0]<b[0]?1:-1).map(([d,list])=>`<div class="day"><h3>${fmtDay(d)}</h3><div class="entries">${list.map(a=>{
     const p=player(a.player);
-    return `<div class="entry" style="--c:${pcol(a.player)}"><span class="av">${p.ini}</span><div class="txt">${p.name}<div class="sub">${a.row}er · ${a.bpm} BPM · ${a.steps}/${a.maxSteps}</div></div><div class="res">${a.reached}${a.complete?"<small>geschafft</small>":""}</div>${readOnly?"":`<button class="del${pendingDel===a.id?" confirm":""}" data-del="${a.id}" aria-label="Versuch löschen">${pendingDel===a.id?"Löschen?":"×"}</button>`}</div>`;
+    return `<div class="entry" style="--c:${pcol(a.player)}"><span class="av">${p.ini}</span><div class="txt">${p.name}<div class="sub">${rowShort(a.row)} · ${a.bpm} BPM · ${a.steps}/${a.maxSteps}</div></div><div class="res">${a.reached}${a.complete?"<small>geschafft</small>":""}</div>${readOnly?"":`<button class="del${pendingDel===a.id?" confirm":""}" data-del="${a.id}" aria-label="Versuch löschen">${pendingDel===a.id?"Löschen?":"×"}</button>`}</div>`;
   }).join("")}</div></div>`).join("");
 }
 function renderSettings(){
@@ -752,21 +824,23 @@ $("players").addEventListener("click",e=>{
   const b=e.target.closest("[data-p]");if(!b)return;
   sel.player=b.dataset.p;
   const mine=attempts.filter(a=>a.player===sel.player).sort((a,b)=>b.ts-a.ts);
-  if(mine[0])sel.row=mine[0].row;
+  if(mine[0]){sel.row=mine[0].row;sel.level=levelOf(sel.row).id;}else if(sel.row&&!levelOf(sel.row))sel.row=null;
   if(sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
   render();
 });
 $("rows").addEventListener("click",e=>{
   const b=e.target.closest("[data-r]");if(!b)return;
   sel.row=Number(b.dataset.r);
-  sel.bpm=sel.player?statsFor(sel.player,sel.row).level:START_BPM;
+  sel.bpm=sel.player?statsFor(sel.player,sel.row).level:startBpm(sel.row);
   render();
 });
 $("board").addEventListener("click",e=>{
   const b=e.target.closest("[data-p]");if(!b)return;
-  sel.player=b.dataset.p;sel.row=Number(b.dataset.r);sel.bpm=statsFor(sel.player,sel.row).level;
+  sel.player=b.dataset.p;sel.row=Number(b.dataset.r);sel.level=levelOf(sel.row).id;sel.bpm=statsFor(sel.player,sel.row).level;
   render();location.hash="#spielen";
 });
+$("levels").addEventListener("click",e=>{const b=e.target.closest("[data-lv]");if(!b||sel.level===b.dataset.lv)return;sel.level=b.dataset.lv;sel.row=null;render()});
+$("boardLevels").addEventListener("click",e=>{const b=e.target.closest("[data-blv]");if(!b)return;boardLevel=b.dataset.blv;renderBoard()});
 $("bpmDown").onclick=()=>{sel.bpm=Math.max(MIN_BPM,sel.bpm-5);renderTempo()};
 $("bpmUp").onclick=()=>{sel.bpm=Math.min(MAX_BPM,sel.bpm+5);renderTempo()};
 $("log").addEventListener("click",async e=>{
@@ -791,11 +865,16 @@ function writeErr(e){
    an die Tabelle geschickt, sobald Netz da ist. */
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxXg-sxCHWfbYn8DM17Yls9m861ocFuprK4j4coM30f1Q0EXc9jM_QVc4SFZz-iY6Qa/exec";
 const USE_SHEET=!!SHEET_URL&&!location.hostname.endsWith("claude.ai")&&!location.hostname.endsWith("claudeusercontent.com");
-const LS_SHEET="einmaleins-sheet-v1";
+const LS_AUTH="einmaleins-auth-v2";
+let auth=null;
+function loadAuth(){try{const o=JSON.parse(localStorage.getItem(LS_AUTH)||"null");auth=o&&o.key&&o.token?o:null}catch(e){auth=null}}
+function saveAuth(){try{auth?localStorage.setItem(LS_AUTH,JSON.stringify(auth)):localStorage.removeItem(LS_AUTH)}catch(e){}}
+function sheetKey(){return "einmaleins-sheet-v2-"+(auth?auth.key:"")}
 let sheetServer=[],sheetQueue=[],flushing=false,lastSync=null;
-function sheetSave(){try{localStorage.setItem(LS_SHEET,JSON.stringify({server:sheetServer,queue:sheetQueue,goal:config.goal,lastSync}))}catch(e){}}
+function sheetSave(){if(!auth)return;try{localStorage.setItem(sheetKey(),JSON.stringify({server:sheetServer,queue:sheetQueue,goal:config.goal,lastSync}))}catch(e){}}
 function sheetLoadCache(){
-  try{const o=JSON.parse(localStorage.getItem(LS_SHEET)||"{}");
+  sheetServer=[];sheetQueue=[];lastSync=null;
+  try{const o=JSON.parse(localStorage.getItem(sheetKey())||"{}");
     sheetServer=(o.server||[]).map(a=>norm(a.id,a)).filter(Boolean);sheetQueue=Array.isArray(o.queue)?o.queue:[];
     if(o.goal==="x10"||o.goal==="100")config.goal=o.goal;lastSync=o.lastSync||null;}catch(e){}
 }
@@ -806,8 +885,9 @@ function sheetApply(){
 }
 function sheetStatus(){
   const bn=$("banner");
-  if(sheetQueue.length){bn.hidden=false;bn.textContent=`${sheetQueue.length} ${sheetQueue.length===1?"Ergebnis wartet":"Ergebnisse warten"} auf Verbindung und ${sheetQueue.length===1?"wird":"werden"} automatisch in die Google-Tabelle nachgetragen.`;}
-  else if(!lastSync){bn.hidden=false;bn.textContent="Verbinde mit der Google-Tabelle …";}
+  if(!auth){bn.hidden=true;return}
+  if(sheetQueue.length){bn.hidden=false;bn.textContent=`${sheetQueue.length} ${sheetQueue.length===1?"Ergebnis wartet":"Ergebnisse warten"} auf Verbindung und ${sheetQueue.length===1?"wird":"werden"} automatisch nachgetragen.`;}
+  else if(!lastSync){bn.hidden=false;bn.textContent="Verbinde …";}
   else bn.hidden=true;
 }
 function sheetEnqueue(op){
@@ -815,14 +895,18 @@ function sheetEnqueue(op){
   if(op.action==="config")sheetQueue=sheetQueue.filter(q=>q.action!=="config");
   sheetQueue.push(op);sheetSave();sheetApply();render();sheetStatus();sheetFlush();
 }
+async function api(body){
+  const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});
+  return r.json();
+}
 async function sheetPost(op){
-  const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...op,pin:getPin()})});
-  const j=await r.json();if(!j.ok){if(j.error==="pin")lockOut();throw new Error(j.error||"Fehler");}
+  const j=await api({...op,key:auth.key,token:auth.token});
+  if(!j.ok){if(j.error==="auth")logout("Bitte neu anmelden.");throw new Error(j.error||"Fehler");}
 }
 async function sheetFlush(){
-  if(flushing||!sheetQueue.length)return;flushing=true;
+  if(flushing||!auth||!sheetQueue.length)return;flushing=true;
   try{
-    while(sheetQueue.length){
+    while(auth&&sheetQueue.length){
       const op=sheetQueue[0];await sheetPost(op);sheetQueue.shift();
       if(op.action==="put"){const n=norm(op.attempt.id,op.attempt);sheetServer=sheetServer.filter(x=>x.id!==op.attempt.id);if(n)sheetServer.push(n);}
       else if(op.action==="del")sheetServer=sheetServer.filter(x=>x.id!==op.id);
@@ -830,21 +914,28 @@ async function sheetFlush(){
     }
   }catch(e){}finally{flushing=false;sheetStatus();}
 }
+function applyFamily(f){
+  if(!f||!auth)return;
+  auth.name=f.name;auth.players=f.players;saveAuth();setPlayers(f.players);
+  if((f.goal==="x10"||f.goal==="100")&&!sheetQueue.some(q=>q.action==="config"))config.goal=f.goal;
+}
 async function sheetPull(){
+  if(!auth)return;
   try{
-    const r=await fetch(SHEET_URL+"?pin="+encodeURIComponent(getPin()),{cache:"no-store"});const j=await r.json();
-    if(!j.ok){if(j.error==="pin")lockOut();throw new Error();}
+    const j=await api({action:"list",key:auth.key,token:auth.token});
+    if(!j.ok){if(j.error==="auth")logout("Bitte neu anmelden.");throw new Error();}
+    applyFamily(j.family);
     sheetServer=(j.attempts||[]).map(a=>norm(a.id,a)).filter(Boolean);
-    if(j.config&&(j.config.goal==="x10"||j.config.goal==="100")&&!sheetQueue.some(q=>q.action==="config"))config.goal=j.config.goal;
     lastSync=Date.now();sheetSave();sheetApply();renderLog.loading=null;render();
   }catch(e){}
   sheetStatus();
 }
-async function sheetSync(){if(!getPin())return;await sheetFlush();await sheetPull();}
+async function sheetSync(){if(!auth)return;await sheetFlush();await sheetPull();}
 let sheetStarted=false;
 function startSheet(){
+  setPlayers(auth.players||[]);sel.player=null;trophyPlayer=null;
   sheetLoadCache();sheetApply();
-  renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden aus der Google-Tabelle geladen …";
+  renderLog.loading=(attempts.length||lastSync)?null:"Ergebnisse werden geladen …";
   render();sheetStatus();sheetSync();
   if(sheetStarted)return;sheetStarted=true;
   setInterval(()=>{if(document.visibilityState==="visible")sheetSync()},30000);
@@ -852,34 +943,81 @@ function startSheet(){
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sheetSync()});
 }
 
-/* Family code: checked by the Google script, never stored in this page's source */
-const LS_PIN="einmaleins-pin-v1";
-function getPin(){try{return localStorage.getItem(LS_PIN)||""}catch(e){return ""}}
-function setPin(p){try{p?localStorage.setItem(LS_PIN,p):localStorage.removeItem(LS_PIN)}catch(e){}}
-let gateCode="",gateBusy=false;
-function showGate(msg){gateCode="";$("gate").hidden=false;$("gateMsg").textContent=msg||"Bitte den Familien-Code eingeben.";$("gateMsg").classList.toggle("err",!!msg);gateDots();}
-function lockOut(){setPin("");showGate("Der Code ist nicht mehr gültig. Bitte neu eingeben.");}
-function gateDots(){[...$("gateDots").children].forEach((d,i)=>d.classList.toggle("on",i<gateCode.length))}
-async function gateCheck(){
-  gateBusy=true;$("gateMsg").textContent="Prüfe …";$("gateMsg").classList.remove("err");
+/* ---------- Family login / registration ---------- */
+const AUTH_ERR={login:"Familienname oder Passwort stimmt nicht.",locked:"Zu viele Versuche. Bitte in 15 Minuten nochmal.",name:"Bitte einen Familiennamen eingeben.",
+  password:"Das Passwort braucht mindestens 6 Zeichen.",taken:"Diesen Familiennamen gibt es schon. Bitte einen anderen wählen, z. B. mit Ort.",players:"Bitte mindestens einen Spieler eintragen."};
+function gateMsg(t,err){$("gateMsg").textContent=t;$("gateMsg").classList.toggle("err",!!err)}
+function gateTab(reg){$("gTabLogin").setAttribute("aria-pressed",!reg);$("gTabReg").setAttribute("aria-pressed",reg);$("loginForm").hidden=reg;$("regForm").hidden=!reg;
+  gateMsg(reg?"Lege deine Familie an. Das Passwort braucht ihr später auf jedem Handy.":"Melde deine Familie an oder lege eine neue an.");}
+function playerInputs(el,list,addBtn){
+  el.innerHTML="";const n=Math.max(2,list.length);
+  for(let i=0;i<n;i++)addPlayerInput(el,list[i],addBtn);
+}
+function addPlayerInput(el,p,addBtn){
+  if(el.children.length>=MAX_PLAYERS)return;
+  const i=document.createElement("input");i.placeholder="Spieler "+(el.children.length+1);i.maxLength=20;i.autocapitalize="words";i.id=el.id+"-"+el.children.length;
+  if(p){i.value=p.name;i.dataset.pid=p.id}
+  el.appendChild(i);addBtn.hidden=el.children.length>=MAX_PLAYERS;
+}
+function readPlayers(el){return [...el.children].map(i=>({id:i.dataset.pid||undefined,name:cleanName(i.value)})).filter(p=>p.name)}
+function showGate(msg){$("gate").hidden=false;gateTab(false);if(msg)gateMsg(msg,true);playerInputs($("rPlayers"),[],$("rAdd"));}
+function logout(msg){auth=null;saveAuth();attempts=[];sheetServer=[];sheetQueue=[];setPlayers([]);render();showGate(msg);}
+function shake(){const c=$("gateCard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}
+async function gateSubmit(body,btn){
+  btn.disabled=true;gateMsg("Einen Moment …");
   try{
-    const r=await fetch(SHEET_URL+"?pin="+encodeURIComponent(gateCode),{cache:"no-store"});const j=await r.json();
-    if(j.ok){setPin(gateCode);$("gate").hidden=true;startSheet();}
-    else{const c=$("gateCard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");gateCode="";gateDots();$("gateMsg").textContent="Falscher Code. Nochmal versuchen.";$("gateMsg").classList.add("err");}
-  }catch(e){gateCode="";gateDots();$("gateMsg").textContent="Keine Verbindung. Bitte mit Internet nochmal versuchen.";$("gateMsg").classList.add("err");}
-  gateBusy=false;
+    const j=await api(body);
+    if(j.ok){auth={key:j.family.key,token:j.token,name:j.family.name,players:j.family.players};saveAuth();$("gate").hidden=true;
+      if(j.family.goal)config.goal=j.family.goal;startSheet();toast(body.action==="register"?`Willkommen, Familie ${cleanName(j.family.name)}!`:`Angemeldet als Familie ${cleanName(j.family.name)}`);}
+    else{shake();gateMsg(AUTH_ERR[j.error]||"Das hat nicht geklappt. Bitte nochmal versuchen.",true);}
+  }catch(e){gateMsg("Keine Verbindung. Bitte mit Internet nochmal versuchen.",true);}
+  btn.disabled=false;
 }
-function gateKey(k){
-  if(gateBusy||$("gate").hidden)return;
-  if(k==="del")gateCode=gateCode.slice(0,-1);else if(/^\d$/.test(k)&&gateCode.length<4)gateCode+=k;
-  gateDots();if(gateCode.length===4)gateCheck();
+$("gTabLogin").onclick=()=>gateTab(false);
+$("gTabReg").onclick=()=>gateTab(true);
+$("rAdd").onclick=()=>addPlayerInput($("rPlayers"),null,$("rAdd"));
+$("loginForm").addEventListener("submit",e=>{e.preventDefault();
+  const fam=$("lFam").value.trim(),pw=$("lPw").value;
+  if(!fam||!pw){gateMsg("Bitte Familienname und Passwort eingeben.",true);return}
+  gateSubmit({action:"login",family:fam,password:pw},e.submitter||$("loginForm").querySelector("button"));});
+$("regForm").addEventListener("submit",e=>{e.preventDefault();
+  const fam=cleanName($("rFam").value).slice(0,40),pw=$("rPw").value,players=readPlayers($("rPlayers"));
+  if(fam.length<2){gateMsg(AUTH_ERR.name,true);return}
+  if(pw.length<6){gateMsg(AUTH_ERR.password,true);return}
+  if(pw!==$("rPw2").value){gateMsg("Die beiden Passwörter sind nicht gleich.",true);return}
+  if(!players.length){gateMsg(AUTH_ERR.players,true);return}
+  gateSubmit({action:"register",family:fam,password:pw,players:players.map(p=>p.name)},e.submitter||$("regForm").querySelector("button"));});
+
+/* Family settings in Statistik */
+function renderFamily(){
+  const sec=$("famSection");if(!sec)return;
+  sec.hidden=!(USE_SHEET&&auth);if(sec.hidden)return;
+  $("famLabel").textContent="Familie "+cleanName(auth.name);
+  if(!renderFamily.dirty)playerInputs($("fPlayers"),PLAYERS,$("fAdd"));
 }
-$("gatePad").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b)gateKey(b.dataset.k)});
-document.addEventListener("keydown",e=>{if($("gate").hidden)return;if(/^\d$/.test(e.key))gateKey(e.key);else if(e.key==="Backspace")gateKey("del");});
+$("fPlayers").addEventListener("input",()=>{renderFamily.dirty=true});
+$("fAdd").onclick=()=>{renderFamily.dirty=true;addPlayerInput($("fPlayers"),null,$("fAdd"))};
+$("fSave").onclick=async()=>{
+  const players=readPlayers($("fPlayers"));if(!players.length){toast("Mindestens ein Spieler bitte.");return}
+  $("fSave").disabled=true;
+  try{const j=await api({action:"players",key:auth.key,token:auth.token,players});
+    if(j.ok){renderFamily.dirty=false;applyFamily(j.family);render();toast("Spieler gespeichert.")}
+    else if(j.error==="auth")logout("Bitte neu anmelden.");else toast("Speichern hat nicht geklappt.");
+  }catch(e){toast("Keine Verbindung. Bitte später nochmal.")}
+  $("fSave").disabled=false;
+};
+$("fInvite").onclick=async()=>{
+  const url=location.origin+location.pathname;
+  const text="Macht mit beim Einmaleins-Metronom! Unter \"Neue Familie\" könnt ihr euch mit eigenem Passwort anmelden.";
+  try{if(navigator.share){await navigator.share({title:"Einmaleins-Metronom",text,url});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(text+" "+url);toast("Link kopiert.")}catch(e){toast(url)}
+};
+$("fLogout").onclick=()=>{if(sheetQueue.length&&!confirmLogout.armed){confirmLogout.armed=true;toast("Es warten noch Ergebnisse. Nochmal tippen zum Abmelden.");setTimeout(()=>confirmLogout.armed=false,4000);return}logout()};
+function confirmLogout(){}
 
 const store={
   async put(a){
-    const body={player:a.player,row:a.row,bpm:a.bpm,steps:a.steps,maxSteps:a.maxSteps,reached:a.steps*a.row,complete:a.steps>=a.maxSteps,date:a.date,ts:a.ts};
+    const body={player:a.player,row:a.row,bpm:a.bpm,steps:a.steps,maxSteps:a.maxSteps,reached:val(a.row,a.steps),complete:a.steps>=a.maxSteps,date:a.date,ts:a.ts};
     if(USE_SHEET){sheetEnqueue({action:"put",attempt:{id:a.id,...body}});return true;}
     if(db){
       const ref=db.collection("attempts").doc(a.id);
@@ -905,7 +1043,8 @@ const store={
 async function init(){
   route();render();
   if(USE_SHEET){
-    if(getPin())startSheet();else showGate();
+    loadAuth();
+    if(auth)startSheet();else{setPlayers([]);render();showGate();}
     return;
   }
   renderLog.loading="Ergebnisse werden geladen …";renderLog();
@@ -965,7 +1104,7 @@ function showBeat(idx){
     [...$("stDots").children].forEach((d,i)=>d.classList.toggle("on",i<=idx));
   }else{
     const k=idx-3;
-    num.textContent=k*run.row;num.classList.remove("count");eq.textContent=`${k} × ${run.row}`;
+    num.textContent=val(run.row,k);num.classList.remove("count");eq.textContent=eqText(run.row,k);
     $("stDots").style.visibility="hidden";
     $("stBar").style.width=(k/run.steps*100)+"%";
   }
@@ -984,7 +1123,7 @@ $("startBtn").onclick=async()=>{
   run={player:sel.player,row:sel.row,bpm:sel.bpm,steps:stepsFor(sel.row,config.goal),iv:60/sel.bpm,next:0,shown:-1,done:false,nodes:[]};
   run.total=4+run.steps;
   run.start=ctx.currentTime+0.25;
-  $("stWho").innerHTML=`${p.name}<span>${run.row}er-Reihe · ${run.bpm} BPM · bis ${run.steps*run.row}</span>`;
+  $("stWho").innerHTML=`${p.name}<span>${rowLabel(run.row)} · ${run.bpm} BPM · bis ${val(run.row,run.steps)}</span>`;
   $("stNum").textContent="4";$("stNum").classList.add("count");$("stEq").textContent="Gleich geht's los";
   $("stDots").style.visibility="visible";[...$("stDots").children].forEach(d=>d.classList.remove("on"));
   $("stBar").style.width="0";
@@ -1021,19 +1160,19 @@ async function finish(steps){
 }
 function resAttempt(){return norm(res.id,{player:res.player,row:res.row,bpm:res.bpm,steps:res.steps,maxSteps:res.maxSteps,date:res.date,ts:res.ts})}
 function showResult(){
-  const r=res,b=r.before,p=player(r.player),max=r.maxSteps,reached=r.steps*r.row;
+  const r=res,b=r.before,p=player(r.player),max=r.maxSteps,reached=val(r.row,r.steps);
   let title,msg,win=false;
   if(r.steps>=max){
     win=true;title="Reihe geschafft!";
-    msg=(b.unlocked==null||r.bpm>b.unlocked)?`${p.name} hat die ${r.row}er-Reihe bei ${r.bpm} BPM ohne Fehler geschafft. Neues Level: <b>${r.bpm+STEP_BPM} BPM</b>.`:`${r.bpm} BPM war in der ${r.row}er-Reihe schon freigeschaltet. Gute Aufwärmrunde.`;
+    msg=(b.unlocked==null||r.bpm>b.unlocked)?`${p.name} hat ${r.row>100?"die "+rowLabel(r.row):"die "+rowLabel(r.row)} bei ${r.bpm} BPM ohne Fehler geschafft. Neues Level: <b>${r.bpm+STEP_BPM} BPM</b>.`:`${r.bpm} BPM war bei ${rowLabel(r.row)} schon freigeschaltet. Gute Aufwärmrunde.`;
   }else if(b.record==null){
-    title=`Bis ${reached}`;msg=`Erster Versuch bei ${r.bpm} BPM, das ist jetzt der Rekord. Nächstes Ziel: <b>${Math.min(r.steps+1,max)*r.row}</b>.`;
+    title=`Bis ${reached}`;msg=`Erster Versuch bei ${r.bpm} BPM, das ist jetzt der Rekord. Nächstes Ziel: <b>${val(r.row,Math.min(r.steps+1,max))}</b>.`;
   }else if(r.steps>b.record){
-    win=true;title="Neuer Rekord!";msg=`Bis <b>${reached}</b>, vorher war bei ${b.record*r.row} Schluss. Nächstes Ziel: <b>${Math.min(r.steps+1,max)*r.row}</b>.`;
+    win=true;title="Neuer Rekord!";msg=`Bis <b>${reached}</b>, vorher war bei ${val(r.row,b.record)} Schluss. Nächstes Ziel: <b>${val(r.row,Math.min(r.steps+1,max))}</b>.`;
   }else if(b.last&&r.steps>b.last.steps){
-    title="Besser als letztes Mal";msg=`Bis <b>${reached}</b>, letztes Mal bis ${b.last.reached}. Rekord bleibt ${b.record*r.row}.`;
+    title="Besser als letztes Mal";msg=`Bis <b>${reached}</b>, letztes Mal bis ${b.last.reached}. Rekord bleibt ${val(r.row,b.record)}.`;
   }else{
-    title=`Bis ${reached}`;msg=`Rekord bei ${r.bpm} BPM bleibt <b>${b.record*r.row}</b>. Morgen wieder!`;
+    title=`Bis ${reached}`;msg=`Rekord bei ${r.bpm} BPM bleibt <b>${val(r.row,b.record)}</b>. Morgen wieder!`;
   }
   if(r.failed)msg+=`<br><b style="color:var(--stop)">Noch nicht gespeichert.</b> Tippe auf Fertig, um es nochmal zu versuchen.`;
   $("resTitle").textContent=title;$("resMsg").innerHTML=msg;
@@ -1063,7 +1202,9 @@ $("adjUp").onclick=()=>{if(!res)return;res.steps=Math.min(res.maxSteps,res.steps
 $("resDone").onclick=async()=>{
   if(!res)return;const r=res;
   if(r.steps!==r.saved||r.failed){const ok=await store.put(r);if(!ok){r.failed=true;showResult();return;}}
-  res=null;$("result").hidden=true;render();
+  res=null;$("result").hidden=true;
+  if(sel.player&&sel.row)sel.bpm=statsFor(sel.player,sel.row).level;
+  render();
 };
 $("resDiscard").onclick=async()=>{if(!res)return;const id=res.id;res=null;$("result").hidden=true;await store.del(id);toast("Versuch gelöscht.");};
 
