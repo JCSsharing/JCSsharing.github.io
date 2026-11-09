@@ -1,0 +1,26 @@
+{
+  "name": "Einmaleins-Metronom",
+  "short_name": "1×1",
+  "description": "Die Familien-Challenge fürs Einmaleins im Takt",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101119",
+  "theme_color": "#101119",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

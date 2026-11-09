@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Einmaleins-Metronom</title>
 <meta name="description" content="Die Familien-Challenge fürs Einmaleins: im Takt des Metronoms rechnen, Rekorde jagen, Medaillen und Urkunden sammeln.">
 <meta property="og:type" content="website">
@@ -20,6 +20,10 @@
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-title" content="1×1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -37,13 +41,13 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
-body{padding:0 16px 40px;background:radial-gradient(120% 60% at 50% -10%, color-mix(in srgb,var(--pc,#7b93ff) 16%, transparent), transparent 70%) var(--bg);background-attachment:fixed;transition:background .4s}
+body{padding:0 max(16px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:radial-gradient(120% 60% at 50% -10%, color-mix(in srgb,var(--pc,#7b93ff) 16%, transparent), transparent 70%) var(--bg);background-attachment:fixed;transition:background .4s}
 main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
 h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
 button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
-header{padding-top:18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header{padding-top:calc(18px + env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;gap:12px}
 .brand{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
 .brand i{width:10px;height:10px;border-radius:50%;background:var(--pc,var(--ink));box-shadow:0 0 14px var(--pc,transparent);transition:background .3s}
 .tabs{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px}
@@ -130,7 +134,7 @@ tr:last-child td{padding-bottom:12px}
 .seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink)}
 
 /* Run stage */
-.stage{position:fixed;inset:0;z-index:20;background:#0b0c12;display:flex;flex-direction:column;padding:16px 16px 20px;gap:14px}
+.stage{position:fixed;inset:0;z-index:20;background:#0b0c12;display:flex;flex-direction:column;padding:calc(16px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));gap:14px}
 .stage[hidden]{display:none}
 .stage .top{display:flex;justify-content:space-between;align-items:center}
 .stage .who{font-family:var(--display);font-weight:800;font-size:22px;color:var(--pc)}
@@ -151,7 +155,7 @@ tr:last-child td{padding-bottom:12px}
 @media (prefers-reduced-motion: reduce){.bignum,.avatar{transition:none}.bignum.pulse{transform:none}}
 
 /* Result sheet */
-.result{position:fixed;inset:0;z-index:30;background:rgba(5,6,10,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.result{position:fixed;inset:0;z-index:30;background:rgba(5,6,10,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
 .result[hidden]{display:none}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:22px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:16px}
 .card h2{font-size:28px;font-weight:800;letter-spacing:-.01em}
